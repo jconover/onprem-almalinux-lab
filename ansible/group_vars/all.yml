@@ -1,0 +1,20 @@
+---
+domain: lab.local
+dns_server: 192.168.60.11
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+timezone: America/New_York
+common_packages:
+  - vim
+  - firewalld
+  - chrony
+  - policycoreutils-python-utils
+  - setools-console
+  - bind-utils
+  - tcpdump
+  - net-tools
+  - lvm2
+  - tar
+  - rsync

@@ -1,0 +1,40 @@
+---
+# Base configuration for all hosts
+- hosts: all
+  become: true
+  roles:
+    - common
+    - firewall
+    - monitoring
+
+# DNS on admin nodes
+- hosts: admins
+  become: true
+  roles:
+    - dns
+
+# NFS and LDAP on db nodes
+- hosts: dbs
+  become: true
+  roles:
+    - nfs
+    - ldap
+    - db
+
+# Web servers
+- hosts: apps
+  become: true
+  roles:
+    - web
+
+# HAProxy on bastion
+- hosts: bastion
+  become: true
+  roles:
+    - haproxy
+
+# SSSD on all client nodes
+- hosts: admins:apps:bastion
+  become: true
+  roles:
+    - sssd

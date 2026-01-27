@@ -1,0 +1,12 @@
+---
+nfs_exports:
+  - path: /srv/nfs/shared
+    options: "192.168.60.0/24(rw,sync,no_root_squash)"
+  - path: /srv/nfs/home
+    options: "192.168.60.0/24(rw,sync,root_squash)"
+
+nfs_client_mounts:
+  - src: "{{ hostvars[groups['dbs'][0]].ansible_host | default('192.168.60.13') }}:/srv/nfs/shared"
+    path: /mnt/shared
+    fstype: nfs
+    opts: defaults,_netdev

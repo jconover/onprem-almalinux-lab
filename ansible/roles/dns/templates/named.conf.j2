@@ -1,0 +1,23 @@
+// Managed by Ansible -- do not edit
+options {
+    listen-on port 53 { {% for addr in dns_listen_addresses %}{{ addr }}; {% endfor %}};
+    directory       "/var/named";
+    dump-file       "/var/named/data/cache_dump.db";
+    statistics-file "/var/named/data/named_stats.txt";
+    allow-query     { localhost; 192.168.60.0/24; 192.168.70.0/24; };
+    recursion yes;
+    forwarders { {% for fwd in dns_forwarders %}{{ fwd }}; {% endfor %}};
+    dnssec-validation yes;
+};
+
+zone "{{ dns_domain }}" IN {
+    type master;
+    file "forward.{{ dns_domain }}";
+    allow-update { none; };
+};
+
+zone "{{ dns_reverse_zone }}.in-addr.arpa" IN {
+    type master;
+    file "reverse.{{ dns_domain }}";
+    allow-update { none; };
+};

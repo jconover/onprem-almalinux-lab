@@ -1,0 +1,65 @@
+---
+- name: Install MariaDB server and Python MySQL bindings
+  dnf:
+    name:
+      - mariadb-server
+      - python3-PyMySQL
+    state: present
+
+- name: Deploy MariaDB server configuration
+  template:
+    src: server.cnf.j2
+    dest: /etc/my.cnf.d/server.cnf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart mariadb
+
+- name: Enable and start MariaDB
+  service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: Set MariaDB root password
+  mysql_user:
+    name: root
+    host_all: true
+    password: "{{ db_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    state: present
+  no_log: true
+
+- name: Remove anonymous MySQL users
+  mysql_user:
+    name: ''
+    host_all: true
+    login_user: root
+    login_password: "{{ db_root_password }}"
+    state: absent
+  no_log: true
+
+- name: Remove test database
+  mysql_db:
+    name: test
+    login_user: root
+    login_password: "{{ db_root_password }}"
+    state: absent
+
+- name: Create application database
+  mysql_db:
+    name: "{{ db_name }}"
+    login_user: root
+    login_password: "{{ db_root_password }}"
+    state: present
+
+- name: Create application database user
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: "{{ db_name }}.*:ALL"
+    host: '%'
+    login_user: root
+    login_password: "{{ db_root_password }}"
+    state: present
+  no_log: true

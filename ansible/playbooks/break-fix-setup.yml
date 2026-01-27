@@ -1,0 +1,92 @@
+---
+# Break/Fix Scenario Injection Playbook
+# Run this to create breakage scenarios for troubleshooting practice
+# Usage: ansible-playbook -i inventory.ini playbooks/break-fix-setup.yml -e "scenario=selinux_denial"
+
+- hosts: apps[0]
+  become: true
+  tasks:
+    # Scenario 1: SELinux denial on httpd non-standard port
+    - name: "BREAK - SELinux denial: Move httpd to non-standard port"
+      when: scenario | default('all') in ['selinux_denial', 'all']
+      block:
+        - name: Change httpd listen port to 8888
+          lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            regexp: '^Listen '
+            line: 'Listen 8888'
+        - name: Restart httpd (will fail due to SELinux)
+          service:
+            name: httpd
+            state: restarted
+          ignore_errors: true
+
+    # Scenario 2: Firewall misconfiguration
+    - name: "BREAK - Firewall: Remove http service"
+      when: scenario | default('all') in ['firewall_block', 'all']
+      block:
+        - name: Remove http from firewall
+          firewalld:
+            service: http
+            permanent: true
+            state: disabled
+            immediate: true
+
+- hosts: dbs[0]
+  become: true
+  tasks:
+    # Scenario 3: Full /var filesystem
+    - name: "BREAK - Disk full: Fill /var"
+      when: scenario | default('all') in ['disk_full', 'all']
+      block:
+        - name: Create large file in /var
+          command: dd if=/dev/zero of=/var/bigfile bs=1M count=500
+          ignore_errors: true
+
+    # Scenario 4: MariaDB won't start
+    - name: "BREAK - MariaDB: Corrupt config"
+      when: scenario | default('all') in ['mariadb_broken', 'all']
+      block:
+        - name: Insert invalid config
+          lineinfile:
+            path: /etc/my.cnf.d/server.cnf
+            line: "invalid_parameter = true"
+        - name: Stop MariaDB
+          service:
+            name: mariadb
+            state: stopped
+
+- hosts: all
+  become: true
+  tasks:
+    # Scenario 5: Chrony drift
+    - name: "BREAK - NTP: Stop chronyd"
+      when: scenario | default('all') in ['ntp_drift', 'all']
+      service:
+        name: chronyd
+        state: stopped
+        enabled: false
+
+    # Scenario 6: Failed systemd unit
+    - name: "BREAK - Systemd: Create failing service"
+      when: scenario | default('all') in ['systemd_fail', 'all']
+      copy:
+        content: |
+          [Unit]
+          Description=Broken Lab Service
+          [Service]
+          ExecStart=/usr/bin/false
+          Restart=no
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/broken-lab.service
+        mode: '0644'
+
+    - name: Enable and start broken service
+      when: scenario | default('all') in ['systemd_fail', 'all']
+      systemd:
+        name: broken-lab
+        enabled: true
+        state: started
+        daemon_reload: true
+      ignore_errors: true

@@ -1,0 +1,4 @@
+# Managed by Ansible -- do not edit
+{% for key, value in sysctl_params.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

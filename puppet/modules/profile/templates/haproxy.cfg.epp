@@ -1,0 +1,45 @@
+<%- | Integer $frontend_port, Integer $stats_port, Integer $backend_port, String $balance, Hash $backends | -%>
+# Managed by Puppet -- do not edit
+global
+    log         /dev/log local0
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+    stats socket /var/lib/haproxy/stats
+
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option                  http-server-close
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+frontend stats
+    bind *:<%= $stats_port %>
+    stats enable
+    stats uri /stats
+    stats refresh 10s
+
+frontend http_front
+    bind *:<%= $frontend_port %>
+    default_backend http_back
+
+backend http_back
+    balance <%= $balance %>
+    option httpchk GET /
+<% $backends.each |String $name, String $ip| { -%>
+    server <%= $name %> <%= $ip %>:<%= $backend_port %> check
+<% } -%>

@@ -1,0 +1,4 @@
+---
+web_server_name: "{{ inventory_hostname }}.{{ domain }}"
+web_doc_root: /var/www/html
+web_listen_port: 80

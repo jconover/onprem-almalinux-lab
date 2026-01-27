@@ -1,0 +1,74 @@
+---
+# Server tasks (run on db node)
+- name: Install NFS server packages
+  dnf:
+    name:
+      - nfs-utils
+    state: present
+  when: "'dbs' in group_names"
+
+- name: Create NFS export directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ nfs_exports }}"
+  when: "'dbs' in group_names"
+
+- name: Deploy /etc/exports
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Export filesystems
+  when: "'dbs' in group_names"
+
+- name: Set SELinux booleans for NFS
+  seboolean:
+    name: "{{ item }}"
+    state: true
+    persistent: true
+  loop:
+    - nfs_export_all_rw
+    - nfs_export_all_ro
+  when: "'dbs' in group_names"
+
+- name: Enable and start NFS server
+  service:
+    name: nfs-server
+    enabled: true
+    state: started
+  when: "'dbs' in group_names"
+
+# Client tasks (run on non-db nodes)
+- name: Install NFS client packages
+  dnf:
+    name:
+      - nfs-utils
+      - autofs
+    state: present
+  when: "'dbs' not in group_names"
+
+- name: Create mount point directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: "{{ nfs_client_mounts }}"
+  when: "'dbs' not in group_names"
+
+- name: Mount NFS shares
+  mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts }}"
+    state: mounted
+  loop: "{{ nfs_client_mounts }}"
+  when: "'dbs' not in group_names"

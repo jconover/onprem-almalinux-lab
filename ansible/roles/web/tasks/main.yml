@@ -1,0 +1,47 @@
+---
+- name: Install httpd and mod_ssl
+  dnf:
+    name:
+      - httpd
+      - mod_ssl
+    state: present
+
+- name: Deploy vhost configuration
+  template:
+    src: vhost.conf.j2
+    dest: /etc/httpd/conf.d/vhost.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload httpd
+
+- name: Deploy index page
+  copy:
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head><title>{{ inventory_hostname }}</title></head>
+      <body>
+      <h1>{{ inventory_hostname }}</h1>
+      <p>Managed by Ansible | {{ domain }}</p>
+      </body>
+      </html>
+    dest: "{{ web_doc_root }}/index.html"
+    owner: apache
+    group: apache
+    mode: '0644'
+
+- name: Ensure httpd is enabled and running
+  service:
+    name: httpd
+    enabled: true
+    state: started
+
+- name: Verify httpd is serving content
+  uri:
+    url: "http://localhost:{{ web_listen_port }}/"
+    return_content: false
+    status_code: 200
+  register: web_smoke_test
+  retries: 3
+  delay: 5

@@ -1,0 +1,21 @@
+---
+profile::firewall::allowed_services:
+  - mysql
+  - nfs
+  - mountd
+  - rpc-bind
+
+profile::db::db_name: appdb
+profile::db::db_user: appuser
+profile::db::db_password: 'LabApp2024!'
+profile::db::root_password: 'LabRoot2024!'
+profile::db::bind_address: '0.0.0.0'
+profile::db::innodb_buffer_pool_size: '256M'
+
+profile::nfs_server::exports:
+  /srv/nfs/shared:
+    options: 'rw,sync,no_root_squash'
+    clients: '192.168.60.0/24'
+  /srv/nfs/home:
+    options: 'rw,sync,root_squash'
+    clients: '192.168.60.0/24'

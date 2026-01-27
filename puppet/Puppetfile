@@ -1,0 +1,10 @@
+# r10k Puppetfile -- module declarations
+forge "https://forgeapi.puppetlabs.com"
+
+mod 'puppetlabs-stdlib',    '9.0.0'
+mod 'puppetlabs-firewall',  '7.0.0'
+mod 'puppetlabs-concat',    '9.0.0'
+mod 'puppetlabs-ntp',       '10.0.0'
+mod 'puppetlabs-mysql',     '15.0.0'
+mod 'puppetlabs-apache',    '12.0.0'
+mod 'puppet-selinux',       '4.0.0'

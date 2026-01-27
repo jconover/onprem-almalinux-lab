@@ -1,0 +1,35 @@
+---
+- name: Install SSSD and related packages
+  dnf:
+    name:
+      - sssd
+      - sssd-ldap
+      - oddjob
+      - oddjob-mkhomedir
+      - authselect
+    state: present
+
+- name: Deploy SSSD configuration
+  template:
+    src: sssd.conf.j2
+    dest: /etc/sssd/sssd.conf
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Restart sssd
+
+- name: Configure authselect for SSSD
+  command: authselect select sssd with-mkhomedir --force
+  changed_when: true
+
+- name: Enable oddjobd for home directory creation
+  service:
+    name: oddjobd
+    enabled: true
+    state: started
+
+- name: Enable and start SSSD
+  service:
+    name: sssd
+    enabled: true
+    state: started

@@ -1,0 +1,17 @@
+# NOTE: On RHEL 9+ openldap-servers is removed from base repos.
+# Options:
+#   1. Install from EPEL or LTB repos
+#   2. Use 389 Directory Server (389-ds-base) instead
+#
+# This file provides a reference OLC config for openldap-servers
+# if available. See docs/ldap-sssd.md for 389-ds alternative.
+#
+dn: olcDatabase={2}mdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=lab,dc=local
+
+dn: olcDatabase={2}mdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=admin,dc=lab,dc=local

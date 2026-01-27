@@ -1,0 +1,31 @@
+---
+profile::base::packages:
+  - vim
+  - firewalld
+  - chrony
+  - policycoreutils-python-utils
+  - setools-console
+  - bind-utils
+  - tcpdump
+  - net-tools
+  - lvm2
+  - tar
+  - rsync
+
+profile::base::timezone: America/New_York
+profile::base::domain: lab.local
+profile::base::selinux_mode: enforcing
+
+profile::base::ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+profile::base::sysctl_settings:
+  net.ipv4.ip_forward: '0'
+  net.ipv4.conf.all.send_redirects: '0'
+  net.ipv4.conf.default.accept_redirects: '0'
+  net.ipv4.icmp_echo_ignore_broadcasts: '1'
+  net.ipv4.conf.all.log_martians: '1'
+
+profile::monitoring::node_exporter_version: '1.7.0'

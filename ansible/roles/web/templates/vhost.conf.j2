@@ -1,0 +1,13 @@
+# Managed by Ansible -- do not edit
+<VirtualHost *:{{ web_listen_port }}>
+    ServerName {{ web_server_name }}
+    DocumentRoot {{ web_doc_root }}
+
+    <Directory {{ web_doc_root }}>
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorLog logs/{{ web_server_name }}-error_log
+    CustomLog logs/{{ web_server_name }}-access_log combined
+</VirtualHost>

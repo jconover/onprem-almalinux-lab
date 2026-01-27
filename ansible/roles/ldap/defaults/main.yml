@@ -1,0 +1,20 @@
+---
+ldap_domain: lab.local
+ldap_base_dn: "dc=lab,dc=local"
+ldap_org: "Lab Organization"
+ldap_admin_password: "{{ vault_ldap_admin_password | default('changeme') }}"
+ldap_users:
+  - uid: testuser1
+    cn: "Test User One"
+    sn: "One"
+    uidNumber: 10001
+    gidNumber: 10001
+    homeDirectory: /home/testuser1
+    loginShell: /bin/bash
+  - uid: testuser2
+    cn: "Test User Two"
+    sn: "Two"
+    uidNumber: 10002
+    gidNumber: 10002
+    homeDirectory: /home/testuser2
+    loginShell: /bin/bash

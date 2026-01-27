@@ -1,0 +1,54 @@
+---
+# NOTE: openldap-servers removed from RHEL 9+ base repos.
+# This role attempts EPEL install; falls back to documentation guidance.
+# For production, consider 389 Directory Server (389-ds-base).
+
+- name: Install OpenLDAP packages (EPEL required on EL9+)
+  dnf:
+    name:
+      - openldap
+      - openldap-servers
+      - openldap-clients
+    state: present
+  ignore_errors: true
+  register: ldap_install
+
+- name: Warn if OpenLDAP server not available
+  debug:
+    msg: >
+      openldap-servers not available in base repos.
+      On RHEL 9+, use EPEL or switch to 389-ds-base.
+      See docs/ldap-sssd.md for alternatives.
+  when: ldap_install is failed
+
+- name: Enable and start slapd
+  service:
+    name: slapd
+    enabled: true
+    state: started
+  when: ldap_install is succeeded
+
+- name: Deploy base LDIF
+  template:
+    src: base.ldif.j2
+    dest: /tmp/base.ldif
+    owner: root
+    group: root
+    mode: '0600'
+  when: ldap_install is succeeded
+
+- name: Check if base DIT already loaded
+  command: ldapsearch -x -b "{{ ldap_base_dn }}" -s base
+  register: ldap_base_check
+  changed_when: false
+  failed_when: false
+  when: ldap_install is succeeded
+
+- name: Load base DIT
+  command: >
+    ldapadd -x -D "cn=admin,{{ ldap_base_dn }}"
+    -w "{{ ldap_admin_password }}" -f /tmp/base.ldif
+  when:
+    - ldap_install is succeeded
+    - ldap_base_check.rc != 0
+  no_log: true

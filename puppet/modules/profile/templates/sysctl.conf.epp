@@ -1,0 +1,5 @@
+<%- | Hash $settings | -%>
+# Managed by Puppet -- do not edit
+<% $settings.each |String $key, String $value| { -%>
+<%= $key %> = <%= $value %>
+<% } -%>

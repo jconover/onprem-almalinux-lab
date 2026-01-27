@@ -1,0 +1,54 @@
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "almalinux/9"
+
+  nodes = [
+    { name: "alma9-bastion", ip: "192.168.70.10", mem: 2048 },
+    { name: "alma9-admin",   ip: "192.168.70.11", mem: 4096 },
+    { name: "alma9-app",     ip: "192.168.70.12", mem: 3072 },
+    { name: "alma9-app2",    ip: "192.168.70.14", mem: 3072 },
+    { name: "alma9-db",      ip: "192.168.70.13", mem: 3072 }
+  ]
+
+  nodes.each do |n|
+    config.vm.define n[:name] do |node|
+      node.vm.hostname = n[:name]
+      node.vm.network "private_network", ip: n[:ip]
+
+      node.vm.provider :libvirt do |lv|
+        lv.cpus = 2
+        lv.memory = n[:mem]
+
+        # Add extra disks to db node for LVM labs
+        if n[:name] == "alma9-db"
+          lv.storage :file, size: "5G", type: "raw", device: "vdb"
+          lv.storage :file, size: "5G", type: "raw", device: "vdc"
+        end
+      end
+
+      node.vm.provision "shell", path: "../../provision/provision-common.sh"
+    end
+  end
+
+  # Application nodes -- httpd
+  ["alma9-app", "alma9-app2"].each do |app_name|
+    config.vm.define app_name do |app|
+      app.vm.provision "shell", inline: <<-SHELL
+        dnf -y install httpd
+        systemctl enable --now httpd
+        firewall-cmd --permanent --add-service=http
+        firewall-cmd --reload
+      SHELL
+    end
+  end
+
+  # Database node -- MariaDB
+  config.vm.define "alma9-db" do |db|
+    db.vm.provision "shell", inline: <<-SHELL
+      dnf -y install mariadb-server
+      systemctl enable --now mariadb
+      firewall-cmd --permanent --add-service=mysql
+      firewall-cmd --reload
+    SHELL
+  end
+end

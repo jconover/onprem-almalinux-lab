@@ -1,0 +1,15 @@
+---
+- name: Ensure firewalld is running
+  service:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: Allow configured services through firewall
+  firewalld:
+    service: "{{ item }}"
+    zone: "{{ firewall_zone }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ firewall_services }}"

@@ -1,0 +1,15 @@
+# Managed by Ansible -- do not edit
+[sssd]
+services = nss, pam
+domains = {{ domain }}
+
+[domain/{{ domain }}]
+id_provider = ldap
+auth_provider = ldap
+ldap_uri = {{ sssd_ldap_uri }}
+ldap_search_base = {{ sssd_ldap_base_dn }}
+ldap_user_search_base = {{ sssd_ldap_user_search_base }}
+ldap_group_search_base = {{ sssd_ldap_group_search_base }}
+ldap_id_use_start_tls = False
+cache_credentials = True
+enumerate = True

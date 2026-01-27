@@ -1,0 +1,7 @@
+---
+haproxy_frontend_port: 80
+haproxy_stats_port: 8404
+haproxy_stats_enabled: true
+haproxy_backend_servers: "{{ groups['apps'] | default([]) }}"
+haproxy_backend_port: 80
+haproxy_balance_algorithm: roundrobin

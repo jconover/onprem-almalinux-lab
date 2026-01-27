@@ -1,0 +1,12 @@
+---
+profile::firewall::allowed_services:
+  - http
+  - https
+
+profile::haproxy::frontend_port: 80
+profile::haproxy::stats_port: 8404
+profile::haproxy::backend_port: 80
+profile::haproxy::balance: roundrobin
+profile::haproxy::backends:
+  alma10-app: '192.168.60.12'
+  alma10-app2: '192.168.60.14'

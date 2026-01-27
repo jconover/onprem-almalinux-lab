@@ -1,0 +1,23 @@
+<%- | String $domain, Hash $records, String $ns_ip, String $zone_type, String $reverse_zone | -%>
+; Managed by Puppet -- do not edit
+$TTL 86400
+@   IN  SOA ns1.<%= $domain %>. admin.<%= $domain %>. (
+            2024010101  ; Serial
+            3600        ; Refresh
+            1800        ; Retry
+            604800      ; Expire
+            86400 )     ; Minimum TTL
+
+    IN  NS  ns1.<%= $domain %>.
+<% if $zone_type == 'forward' { -%>
+ns1 IN  A   <%= $ns_ip %>
+
+<% $records.each |String $name, String $ip| { -%>
+<%= $name %>  IN  A  <%= $ip %>
+<% } -%>
+<% } else { -%>
+
+<% $records.each |String $name, String $ip| { -%>
+<%= split($ip, '[.]')[3] %>  IN  PTR  <%= $name %>.<%= $domain %>.
+<% } -%>
+<% } -%>

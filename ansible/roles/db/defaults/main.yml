@@ -1,0 +1,7 @@
+---
+db_name: appdb
+db_user: appuser
+db_password: "{{ vault_db_app_password | default('changeme') }}"
+db_root_password: "{{ vault_db_root_password | default('changeme') }}"
+db_bind_address: 0.0.0.0
+db_innodb_buffer_pool_size: 256M

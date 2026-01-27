@@ -1,0 +1,46 @@
+---
+- name: Install BIND packages
+  dnf:
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Deploy named.conf
+  template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: '0640'
+  notify: Restart named
+
+- name: Deploy forward zone file
+  template:
+    src: forward.zone.j2
+    dest: "/var/named/forward.{{ dns_domain }}"
+    owner: root
+    group: named
+    mode: '0640'
+  notify: Reload named
+
+- name: Deploy reverse zone file
+  template:
+    src: reverse.zone.j2
+    dest: "/var/named/reverse.{{ dns_domain }}"
+    owner: root
+    group: named
+    mode: '0640'
+  notify: Reload named
+
+- name: Set SELinux boolean for named
+  seboolean:
+    name: named_write_master_zones
+    state: true
+    persistent: true
+
+- name: Enable and start named
+  service:
+    name: named
+    enabled: true
+    state: started

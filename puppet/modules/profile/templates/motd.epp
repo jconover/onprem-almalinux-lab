@@ -1,0 +1,7 @@
+<%- | String $hostname, String $domain | -%>
+#############################################
+#  <%= upcase($hostname) %>
+#  Managed by Puppet -- do not edit
+#  Domain: <%= $domain %>
+#  Environment: Lab
+#############################################

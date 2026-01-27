@@ -1,0 +1,79 @@
+---
+# Break/Fix Reset Playbook
+# Run this to reset all break/fix scenarios to a clean state
+# Usage: ansible-playbook -i inventory.ini playbooks/break-fix-reset.yml
+
+- hosts: apps[0]
+  become: true
+  tasks:
+    - name: "RESET - Restore httpd listen port"
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen '
+        line: 'Listen 80'
+      notify: Restart httpd
+
+    - name: "RESET - Re-enable http in firewall"
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+  handlers:
+    - name: Restart httpd
+      service:
+        name: httpd
+        state: restarted
+
+- hosts: dbs[0]
+  become: true
+  tasks:
+    - name: "RESET - Remove /var bigfile"
+      file:
+        path: /var/bigfile
+        state: absent
+
+    - name: "RESET - Remove invalid MariaDB config line"
+      lineinfile:
+        path: /etc/my.cnf.d/server.cnf
+        line: "invalid_parameter = true"
+        state: absent
+      notify: Restart mariadb
+
+    - name: "RESET - Ensure MariaDB is running"
+      service:
+        name: mariadb
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Restart mariadb
+      service:
+        name: mariadb
+        state: restarted
+
+- hosts: all
+  become: true
+  tasks:
+    - name: "RESET - Enable and start chronyd"
+      service:
+        name: chronyd
+        enabled: true
+        state: started
+
+    - name: "RESET - Remove broken-lab service"
+      block:
+        - name: Stop broken-lab service
+          systemd:
+            name: broken-lab
+            state: stopped
+            enabled: false
+          ignore_errors: true
+        - name: Remove broken-lab unit file
+          file:
+            path: /etc/systemd/system/broken-lab.service
+            state: absent
+        - name: Reload systemd
+          systemd:
+            daemon_reload: true

@@ -1,0 +1,5 @@
+---
+sssd_ldap_uri: "ldap://{{ hostvars[groups['dbs'][0]].ansible_host | default('192.168.60.13') }}"
+sssd_ldap_base_dn: "dc=lab,dc=local"
+sssd_ldap_user_search_base: "ou=People,dc=lab,dc=local"
+sssd_ldap_group_search_base: "ou=Groups,dc=lab,dc=local"

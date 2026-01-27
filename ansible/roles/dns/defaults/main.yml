@@ -1,0 +1,15 @@
+---
+dns_domain: lab.local
+dns_reverse_zone: "60.168.192"
+dns_forwarders:
+  - 8.8.8.8
+  - 8.8.4.4
+dns_records:
+  - { name: "alma10-bastion", ip: "192.168.60.10" }
+  - { name: "alma10-admin",   ip: "192.168.60.11" }
+  - { name: "alma10-app",     ip: "192.168.60.12" }
+  - { name: "alma10-db",      ip: "192.168.60.13" }
+  - { name: "alma10-app2",    ip: "192.168.60.14" }
+dns_listen_addresses:
+  - "127.0.0.1"
+  - "{{ ansible_default_ipv4.address }}"

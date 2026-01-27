@@ -1,0 +1,27 @@
+---
+- name: Install HAProxy
+  dnf:
+    name: haproxy
+    state: present
+
+- name: Deploy HAProxy configuration
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+    validate: haproxy -c -f %s
+  notify: Restart haproxy
+
+- name: Set SELinux boolean for HAProxy to connect to backends
+  seboolean:
+    name: haproxy_connect_any
+    state: true
+    persistent: true
+
+- name: Enable and start HAProxy
+  service:
+    name: haproxy
+    enabled: true
+    state: started

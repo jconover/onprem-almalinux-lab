@@ -1,0 +1,15 @@
+---
+profile::firewall::allowed_services:
+  - dns
+
+profile::dns::domain: lab.local
+profile::dns::reverse_zone: '60.168.192'
+profile::dns::forwarders:
+  - '8.8.8.8'
+  - '8.8.4.4'
+profile::dns::records:
+  alma10-bastion: '192.168.60.10'
+  alma10-admin: '192.168.60.11'
+  alma10-app: '192.168.60.12'
+  alma10-db: '192.168.60.13'
+  alma10-app2: '192.168.60.14'

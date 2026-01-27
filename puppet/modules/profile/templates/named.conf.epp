@@ -1,0 +1,24 @@
+<%- | String $domain, String $reverse_zone, Array $forwarders, String $listen_addr | -%>
+// Managed by Puppet -- do not edit
+options {
+    listen-on port 53 { 127.0.0.1; <%= $listen_addr %>; };
+    directory       "/var/named";
+    dump-file       "/var/named/data/cache_dump.db";
+    statistics-file "/var/named/data/named_stats.txt";
+    allow-query     { localhost; 192.168.60.0/24; 192.168.70.0/24; };
+    recursion yes;
+    forwarders { <% $forwarders.each |String $fwd| { %><%= $fwd %>; <% } %>};
+    dnssec-validation yes;
+};
+
+zone "<%= $domain %>" IN {
+    type master;
+    file "forward.<%= $domain %>";
+    allow-update { none; };
+};
+
+zone "<%= $reverse_zone %>.in-addr.arpa" IN {
+    type master;
+    file "reverse.<%= $domain %>";
+    allow-update { none; };
+};

@@ -1,0 +1,14 @@
+<%- | String $server_name, String $doc_root, Integer $listen_port | -%>
+# Managed by Puppet -- do not edit
+<VirtualHost *:<%= $listen_port %>>
+    ServerName <%= $server_name %>
+    DocumentRoot <%= $doc_root %>
+
+    <Directory <%= $doc_root %>>
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorLog logs/<%= $server_name %>-error_log
+    CustomLog logs/<%= $server_name %>-access_log combined
+</VirtualHost>

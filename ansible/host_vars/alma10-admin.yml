@@ -1,0 +1,6 @@
+---
+firewall_services:
+  - dns
+  - nfs
+  - mountd
+  - rpc-bind

@@ -1,0 +1,37 @@
+# Managed by Ansible
+dn: {{ ldap_base_dn }}
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: {{ ldap_org }}
+dc: {{ ldap_domain.split('.')[0] }}
+
+dn: ou=People,{{ ldap_base_dn }}
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,{{ ldap_base_dn }}
+objectClass: organizationalUnit
+ou: Groups
+
+{% for user in ldap_users %}
+dn: uid={{ user.uid }},ou=People,{{ ldap_base_dn }}
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: {{ user.uid }}
+cn: {{ user.cn }}
+sn: {{ user.sn }}
+uidNumber: {{ user.uidNumber }}
+gidNumber: {{ user.gidNumber }}
+homeDirectory: {{ user.homeDirectory }}
+loginShell: {{ user.loginShell }}
+userPassword: {{ user.uid }}
+
+dn: cn={{ user.uid }},ou=Groups,{{ ldap_base_dn }}
+objectClass: posixGroup
+cn: {{ user.uid }}
+gidNumber: {{ user.gidNumber }}
+memberUid: {{ user.uid }}
+
+{% endfor %}

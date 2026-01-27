@@ -1,0 +1,13 @@
+---
+- name: Restart chronyd
+  service:
+    name: chronyd
+    state: restarted
+
+- name: Reload firewalld
+  service:
+    name: firewalld
+    state: reloaded
+
+- name: Reload sysctl
+  command: sysctl --system

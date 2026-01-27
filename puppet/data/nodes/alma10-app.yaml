@@ -1,0 +1,8 @@
+---
+profile::firewall::allowed_services:
+  - http
+  - https
+
+profile::web::server_name: alma10-app.lab.local
+profile::web::doc_root: /var/www/html
+profile::web::listen_port: 80

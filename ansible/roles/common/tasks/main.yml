@@ -1,0 +1,44 @@
+---
+- name: Install baseline packages
+  dnf:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Deploy MOTD
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy sysctl hardening
+  template:
+    src: sysctl.conf.j2
+    dest: /etc/sysctl.d/99-hardening.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload sysctl
+
+- name: Set SELinux to enforcing
+  selinux:
+    policy: targeted
+    state: "{{ selinux_state }}"
+
+- name: Enable core services
+  service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - firewalld
+    - chronyd

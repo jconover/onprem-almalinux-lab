@@ -1,0 +1,10 @@
+---
+- name: Restart named
+  service:
+    name: named
+    state: restarted
+
+- name: Reload named
+  service:
+    name: named
+    state: reloaded

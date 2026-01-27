@@ -1,0 +1,5 @@
+<%- | Hash $exports | -%>
+# Managed by Puppet -- do not edit
+<% $exports.each |String $path, Hash $opts| { -%>
+<%= $path %>  <%= $opts['clients'] %>(<%= $opts['options'] %>)
+<% } -%>

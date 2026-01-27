@@ -1,0 +1,28 @@
+# Vagrant
+.vagrant/
+*.box
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+
+# Ansible
+*.retry
+ansible/vault_password
+ansible/.vault_pass
+
+# Secrets
+*.pem
+*.key
+vault.yml
+
+# OS / IDE
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
