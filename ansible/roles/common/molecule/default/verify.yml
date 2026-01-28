@@ -1,0 +1,78 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Verify chronyd service is running
+      ansible.builtin.service_facts:
+
+    - name: Assert chronyd is running and enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['chronyd.service'].state == 'running'
+          - ansible_facts.services['chronyd.service'].status == 'enabled'
+        fail_msg: "chronyd service is not running or not enabled"
+        success_msg: "chronyd service is running and enabled"
+
+    - name: Verify firewalld service is running and enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['firewalld.service'].state == 'running'
+          - ansible_facts.services['firewalld.service'].status == 'enabled'
+        fail_msg: "firewalld service is not running or not enabled"
+        success_msg: "firewalld service is running and enabled"
+
+    - name: Get SELinux status
+      ansible.builtin.command: getenforce
+      register: selinux_status
+      changed_when: false
+
+    - name: Assert SELinux is enforcing
+      ansible.builtin.assert:
+        that:
+          - selinux_status.stdout == 'Enforcing'
+        fail_msg: "SELinux is not in enforcing mode: {{ selinux_status.stdout }}"
+        success_msg: "SELinux is in enforcing mode"
+
+    - name: Verify /etc/motd exists
+      ansible.builtin.stat:
+        path: /etc/motd
+      register: motd_file
+
+    - name: Assert /etc/motd exists
+      ansible.builtin.assert:
+        that:
+          - motd_file.stat.exists
+        fail_msg: "/etc/motd does not exist"
+        success_msg: "/etc/motd exists"
+
+    - name: Verify sysctl hardening file exists
+      ansible.builtin.stat:
+        path: /etc/sysctl.d/99-hardening.conf
+      register: sysctl_file
+
+    - name: Assert sysctl hardening file exists
+      ansible.builtin.assert:
+        that:
+          - sysctl_file.stat.exists
+        fail_msg: "/etc/sysctl.d/99-hardening.conf does not exist"
+        success_msg: "/etc/sysctl.d/99-hardening.conf exists"
+
+    - name: Verify baseline packages are installed
+      ansible.builtin.package:
+        name:
+          - vim
+          - chrony
+          - bind-utils
+          - tcpdump
+        state: present
+      check_mode: true
+      register: packages_check
+
+    - name: Assert baseline packages are installed
+      ansible.builtin.assert:
+        that:
+          - not packages_check.changed
+        fail_msg: "Some baseline packages are not installed"
+        success_msg: "All baseline packages are installed"

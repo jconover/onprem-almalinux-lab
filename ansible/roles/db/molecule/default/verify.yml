@@ -1,0 +1,125 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    db_root_password: rootpassword
+    db_name: testdb
+    db_user: testuser
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert mariadb service is running and enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['mariadb.service'].state == 'running'
+          - ansible_facts.services['mariadb.service'].status == 'enabled'
+        fail_msg: "mariadb service is not running or not enabled"
+        success_msg: "mariadb service is running and enabled"
+
+    - name: Verify mariadb-server package is installed
+      ansible.builtin.package:
+        name: mariadb-server
+        state: present
+      check_mode: true
+      register: mariadb_package
+
+    - name: Assert mariadb-server package is installed
+      ansible.builtin.assert:
+        that:
+          - not mariadb_package.changed
+        fail_msg: "mariadb-server package is not installed"
+        success_msg: "mariadb-server package is installed"
+
+    - name: Verify python3-PyMySQL package is installed
+      ansible.builtin.package:
+        name: python3-PyMySQL
+        state: present
+      check_mode: true
+      register: pymysql_package
+
+    - name: Assert python3-PyMySQL package is installed
+      ansible.builtin.assert:
+        that:
+          - not pymysql_package.changed
+        fail_msg: "python3-PyMySQL package is not installed"
+        success_msg: "python3-PyMySQL package is installed"
+
+    - name: Verify MariaDB server configuration exists
+      ansible.builtin.stat:
+        path: /etc/my.cnf.d/server.cnf
+      register: server_cnf
+
+    - name: Assert MariaDB server configuration exists
+      ansible.builtin.assert:
+        that:
+          - server_cnf.stat.exists
+        fail_msg: "/etc/my.cnf.d/server.cnf does not exist"
+        success_msg: "/etc/my.cnf.d/server.cnf exists"
+
+    - name: Verify MariaDB is listening on port 3306
+      ansible.builtin.wait_for:
+        port: 3306
+        timeout: 10
+
+    - name: Verify MariaDB socket exists
+      ansible.builtin.stat:
+        path: /var/lib/mysql/mysql.sock
+      register: mysql_socket
+
+    - name: Assert MariaDB socket exists
+      ansible.builtin.assert:
+        that:
+          - mysql_socket.stat.exists
+        fail_msg: "/var/lib/mysql/mysql.sock does not exist"
+        success_msg: "/var/lib/mysql/mysql.sock exists"
+
+    - name: Test MariaDB connection with root user
+      community.mysql.mysql_info:
+        login_user: root
+        login_password: "{{ db_root_password }}"
+        login_unix_socket: /var/lib/mysql/mysql.sock
+      register: mysql_info
+
+    - name: Assert MariaDB connection successful
+      ansible.builtin.assert:
+        that:
+          - mysql_info is defined
+        fail_msg: "Could not connect to MariaDB"
+        success_msg: "Successfully connected to MariaDB"
+
+    - name: Verify application database exists
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        login_user: root
+        login_password: "{{ db_root_password }}"
+        login_unix_socket: /var/lib/mysql/mysql.sock
+        state: present
+      check_mode: true
+      register: db_check
+
+    - name: Assert application database exists
+      ansible.builtin.assert:
+        that:
+          - not db_check.changed
+        fail_msg: "Application database {{ db_name }} does not exist"
+        success_msg: "Application database {{ db_name }} exists"
+
+    - name: Verify test database has been removed
+      community.mysql.mysql_db:
+        name: test
+        login_user: root
+        login_password: "{{ db_root_password }}"
+        login_unix_socket: /var/lib/mysql/mysql.sock
+        state: absent
+      check_mode: true
+      register: test_db_check
+
+    - name: Assert test database has been removed
+      ansible.builtin.assert:
+        that:
+          - not test_db_check.changed
+        fail_msg: "Test database still exists (security concern)"
+        success_msg: "Test database has been removed"

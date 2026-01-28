@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    # Override variables for testing
+    domain: molecule.test
+    web_server_name: "{{ inventory_hostname }}.molecule.test"
+    web_doc_root: /var/www/html
+    web_listen_port: 80
+  roles:
+    - role: web

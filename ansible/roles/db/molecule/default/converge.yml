@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    # Override variables for testing
+    db_name: testdb
+    db_user: testuser
+    db_password: testpassword
+    db_root_password: rootpassword
+    db_bind_address: 0.0.0.0
+    db_innodb_buffer_pool_size: 128M
+  roles:
+    - role: db

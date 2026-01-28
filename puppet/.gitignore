@@ -1,0 +1,39 @@
+# Hiera-eyaml Keys
+# ================
+# Never commit private or public keys to version control
+*.pem
+keys/
+eyaml/
+
+# Specific key file patterns
+private_key.pkcs7.pem
+public_key.pkcs7.pem
+
+# Decrypted Secrets
+# =================
+# Temporary decrypted files should never be committed
+*.decrypted
+*.decrypted.yaml
+secrets.yaml
+
+# The actual secrets file (encrypted version is safe, but be careful)
+# Uncomment the next line if you want to prevent accidental commits
+# of the real secrets file before encryption is set up
+# secrets.eyaml
+
+# Keep example files tracked
+!*.example
+!secrets.eyaml.example
+
+# Editor Backup Files
+# ===================
+*~
+*.swp
+*.swo
+*.bak
+.*.swp
+
+# OS Generated Files
+# ==================
+.DS_Store
+Thumbs.db

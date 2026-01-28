@@ -1,0 +1,59 @@
+---
+# Database Server role configuration
+# Applied to nodes with pp_role=db_server certificate extension
+
+# Database server specific packages
+profile::base::packages:
+  - vim
+  - firewalld
+  - chrony
+  - policycoreutils-python-utils
+  - setools-console
+  - bind-utils
+  - tcpdump
+  - net-tools
+  - lvm2
+  - tar
+  - rsync
+  - postgresql-server
+  - postgresql-contrib
+
+# Firewall rules for database servers
+profile::firewall::rules:
+  postgresql:
+    port: 5432
+    protocol: tcp
+
+# Database server kernel tuning
+profile::base::sysctl_settings:
+  net.ipv4.ip_forward: '0'
+  net.ipv4.conf.all.send_redirects: '0'
+  vm.swappiness: '1'
+  vm.dirty_ratio: '40'
+  vm.dirty_background_ratio: '10'
+  vm.overcommit_memory: '2'
+  vm.overcommit_ratio: '80'
+  kernel.shmmax: '17179869184'
+  kernel.shmall: '4194304'
+  net.core.somaxconn: '4096'
+
+# PostgreSQL configuration
+profile::postgresql::version: '15'
+profile::postgresql::data_dir: /var/lib/pgsql/15/data
+profile::postgresql::listen_addresses: '*'
+profile::postgresql::max_connections: 200
+profile::postgresql::shared_buffers: 256MB
+profile::postgresql::effective_cache_size: 768MB
+profile::postgresql::work_mem: 4MB
+profile::postgresql::maintenance_work_mem: 64MB
+
+# Backup configuration for databases
+profile::backup::enabled: true
+profile::backup::type: pg_dump
+profile::backup::schedule: hourly
+profile::backup::retention_days: 14
+
+# Database-specific monitoring
+profile::monitoring::postgres_exporter_enabled: true
+profile::monitoring::slow_query_log: true
+profile::monitoring::slow_query_threshold_ms: 1000

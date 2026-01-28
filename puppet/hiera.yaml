@@ -5,7 +5,39 @@ defaults:
   data_hash: yaml_data
 
 hierarchy:
+  # Encrypted secrets using hiera-eyaml (highest priority for secrets)
+  # This level uses eyaml_lookup_key for automatic decryption
+  - name: "Encrypted secrets"
+    lookup_key: eyaml_lookup_key
+    path: "secrets.eyaml"
+    options:
+      pkcs7_private_key: /etc/puppetlabs/puppet/eyaml/private_key.pkcs7.pem
+      pkcs7_public_key: /etc/puppetlabs/puppet/eyaml/public_key.pkcs7.pem
+
+  # Per-node encrypted secrets (for node-specific secrets)
+  - name: "Per-node encrypted secrets"
+    lookup_key: eyaml_lookup_key
+    path: "nodes/%{trusted.certname}.eyaml"
+    options:
+      pkcs7_private_key: /etc/puppetlabs/puppet/eyaml/private_key.pkcs7.pem
+      pkcs7_public_key: /etc/puppetlabs/puppet/eyaml/public_key.pkcs7.pem
+
+  # Most specific: per-node overrides
   - name: "Per-node data"
     path: "nodes/%{trusted.certname}.yaml"
+
+  # Role-based configuration (from certificate extension)
+  - name: "Per-role data"
+    path: "roles/%{trusted.extensions.pp_role}.yaml"
+
+  # Datacenter-specific settings (from custom fact)
+  - name: "Per-datacenter data"
+    path: "datacenters/%{facts.datacenter}.yaml"
+
+  # Environment-specific defaults
+  - name: "Per-environment data"
+    path: "environments/%{environment}.yaml"
+
+  # Least specific: global defaults
   - name: "Common data"
     path: "common.yaml"

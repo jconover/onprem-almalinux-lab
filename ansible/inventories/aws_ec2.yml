@@ -1,0 +1,101 @@
+# AWS EC2 Dynamic Inventory Configuration
+# Documentation: https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html
+---
+plugin: amazon.aws.aws_ec2
+
+# AWS Regions to query
+# Add or remove regions based on your infrastructure
+regions:
+  - us-east-1
+  - us-west-2
+
+# AWS Authentication
+# The plugin uses the standard AWS credential chain:
+# 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+# 2. Shared credentials file (~/.aws/credentials)
+# 3. IAM role (when running on EC2)
+# Uncomment below to specify a profile explicitly:
+# aws_profile: default
+
+# Filter instances by tags
+# Only include instances that match ALL specified filters
+filters:
+  tag:Project: onprem-almalinux-lab
+  instance-state-name: running
+
+# Strict mode - fail if AWS API returns errors
+strict: false
+
+# Create groups based on EC2 instance tags
+# This creates groups like: tag_Role_webserver, tag_Environment_production
+keyed_groups:
+  # Group by Role tag (e.g., webserver, database, loadbalancer)
+  - key: tags.Role
+    prefix: role
+    separator: "_"
+  # Group by Environment tag (e.g., production, staging, development)
+  - key: tags.Environment
+    prefix: env
+    separator: "_"
+  # Group by instance type (e.g., instance_type_t3_micro)
+  - key: instance_type
+    prefix: instance_type
+    separator: "_"
+  # Group by availability zone
+  - key: placement.availability_zone
+    prefix: az
+    separator: "_"
+  # Group by VPC ID
+  - key: vpc_id
+    prefix: vpc
+    separator: "_"
+
+# Additional static groups based on conditions
+groups:
+  # All running instances
+  running: instance_state_name == 'running'
+  # Instances with public IPs
+  public: public_ip_address is defined
+
+# Compose variables - set host variables based on instance attributes
+compose:
+  # Use public IP if available, otherwise use private IP
+  ansible_host: public_ip_address | default(private_ip_address, true)
+  # Set the SSH user based on AMI (adjust as needed)
+  ansible_user: "'ec2-user'"
+  # Instance metadata available as host variables
+  ec2_instance_id: instance_id
+  ec2_region: placement.region
+  ec2_availability_zone: placement.availability_zone
+  ec2_private_ip: private_ip_address
+  ec2_public_ip: public_ip_address | default('')
+  ec2_instance_type: instance_type
+  ec2_image_id: image_id
+  ec2_vpc_id: vpc_id
+  ec2_subnet_id: subnet_id
+  ec2_tags: tags
+
+# Hostnames - how to name hosts in the inventory
+# Priority order: first match wins
+hostnames:
+  # Use Name tag if available
+  - tag:Name
+  # Fall back to instance ID
+  - instance-id
+
+# Include/exclude hosts by instance state
+# Valid states: pending, running, shutting-down, terminated, stopping, stopped
+include_filters:
+  - instance-state-name:
+      - running
+
+# Cache settings for improved performance
+# Reduces API calls when inventory is queried frequently
+cache: true
+cache_plugin: ansible.builtin.jsonfile
+cache_timeout: 300  # 5 minutes
+cache_connection: /tmp/aws_ec2_inventory_cache
+cache_prefix: aws_ec2
+
+# Use IAM instance profile credentials when running from EC2
+# iam_role_arn: arn:aws:iam::123456789012:role/AnsibleEC2Role

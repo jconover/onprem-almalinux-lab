@@ -1,0 +1,56 @@
+---
+# Application Server role configuration
+# Applied to nodes with pp_role=app_server certificate extension
+
+# Application server specific packages
+profile::base::packages:
+  - vim
+  - firewalld
+  - chrony
+  - policycoreutils-python-utils
+  - setools-console
+  - bind-utils
+  - tcpdump
+  - net-tools
+  - lvm2
+  - tar
+  - rsync
+  - java-17-openjdk
+  - java-17-openjdk-devel
+
+# Firewall rules for application servers
+profile::firewall::rules:
+  http:
+    port: 80
+    protocol: tcp
+  https:
+    port: 443
+    protocol: tcp
+  app_port:
+    port: 8080
+    protocol: tcp
+
+# Application server tuning
+profile::base::sysctl_settings:
+  net.ipv4.ip_forward: '0'
+  net.ipv4.conf.all.send_redirects: '0'
+  net.core.somaxconn: '65535'
+  net.ipv4.tcp_max_syn_backlog: '65535'
+  net.ipv4.tcp_fin_timeout: '30'
+  net.ipv4.tcp_keepalive_time: '300'
+  vm.swappiness: '10'
+
+# JVM heap settings (can be overridden per-node)
+profile::java::heap_min: 512m
+profile::java::heap_max: 2g
+profile::java::gc_algorithm: G1GC
+
+# Application deployment settings
+profile::app::deploy_user: appuser
+profile::app::deploy_group: appgroup
+profile::app::app_home: /opt/application
+profile::app::log_dir: /var/log/application
+
+# Health check endpoint
+profile::monitoring::health_check_port: 8080
+profile::monitoring::health_check_path: /health

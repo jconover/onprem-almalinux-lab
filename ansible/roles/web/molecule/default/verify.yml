@@ -1,0 +1,101 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert httpd service is running and enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['httpd.service'].state == 'running'
+          - ansible_facts.services['httpd.service'].status == 'enabled'
+        fail_msg: "httpd service is not running or not enabled"
+        success_msg: "httpd service is running and enabled"
+
+    - name: Verify httpd package is installed
+      ansible.builtin.package:
+        name: httpd
+        state: present
+      check_mode: true
+      register: httpd_package
+
+    - name: Assert httpd package is installed
+      ansible.builtin.assert:
+        that:
+          - not httpd_package.changed
+        fail_msg: "httpd package is not installed"
+        success_msg: "httpd package is installed"
+
+    - name: Verify mod_ssl package is installed
+      ansible.builtin.package:
+        name: mod_ssl
+        state: present
+      check_mode: true
+      register: mod_ssl_package
+
+    - name: Assert mod_ssl package is installed
+      ansible.builtin.assert:
+        that:
+          - not mod_ssl_package.changed
+        fail_msg: "mod_ssl package is not installed"
+        success_msg: "mod_ssl package is installed"
+
+    - name: Verify vhost configuration exists
+      ansible.builtin.stat:
+        path: /etc/httpd/conf.d/vhost.conf
+      register: vhost_conf
+
+    - name: Assert vhost configuration exists
+      ansible.builtin.assert:
+        that:
+          - vhost_conf.stat.exists
+        fail_msg: "/etc/httpd/conf.d/vhost.conf does not exist"
+        success_msg: "/etc/httpd/conf.d/vhost.conf exists"
+
+    - name: Verify document root exists
+      ansible.builtin.stat:
+        path: /var/www/html
+      register: doc_root
+
+    - name: Assert document root exists
+      ansible.builtin.assert:
+        that:
+          - doc_root.stat.exists
+          - doc_root.stat.isdir
+        fail_msg: "/var/www/html does not exist or is not a directory"
+        success_msg: "/var/www/html exists and is a directory"
+
+    - name: Verify index.html exists
+      ansible.builtin.stat:
+        path: /var/www/html/index.html
+      register: index_file
+
+    - name: Assert index.html exists
+      ansible.builtin.assert:
+        that:
+          - index_file.stat.exists
+        fail_msg: "/var/www/html/index.html does not exist"
+        success_msg: "/var/www/html/index.html exists"
+
+    - name: Verify httpd is listening on port 80
+      ansible.builtin.wait_for:
+        port: 80
+        timeout: 10
+      register: port_check
+
+    - name: Test HTTP response from localhost
+      ansible.builtin.uri:
+        url: http://localhost:80/
+        return_content: true
+        status_code: 200
+      register: http_response
+
+    - name: Assert HTTP response is successful
+      ansible.builtin.assert:
+        that:
+          - http_response.status == 200
+        fail_msg: "HTTP response was not successful"
+        success_msg: "HTTP response returned status 200"

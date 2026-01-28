@@ -1,0 +1,50 @@
+---
+# Development environment settings
+# These apply to all nodes in the development environment
+
+# More permissive settings for development
+profile::base::selinux_mode: permissive
+
+# Relaxed sysctl for development/debugging
+profile::base::sysctl_settings:
+  net.ipv4.ip_forward: '1'
+  net.ipv4.conf.all.send_redirects: '0'
+  net.ipv4.conf.default.accept_redirects: '1'
+  net.ipv4.icmp_echo_ignore_broadcasts: '0'
+  net.ipv4.conf.all.log_martians: '0'
+
+# Development NTP servers (public pools acceptable)
+profile::base::ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+# Development packages (additional debugging tools)
+profile::base::packages:
+  - vim
+  - firewalld
+  - chrony
+  - policycoreutils-python-utils
+  - setools-console
+  - bind-utils
+  - tcpdump
+  - net-tools
+  - lvm2
+  - tar
+  - rsync
+  - strace
+  - gdb
+  - htop
+  - tmux
+
+# Monitoring configuration (less retention, no alerting)
+profile::monitoring::enabled: true
+profile::monitoring::retention_days: 7
+profile::monitoring::alerting_enabled: false
+
+# Logging configuration (verbose for debugging)
+profile::logging::log_level: debug
+profile::logging::remote_syslog: ~
+
+# Backup settings (disabled in dev)
+profile::backup::enabled: false

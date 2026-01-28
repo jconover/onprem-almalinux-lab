@@ -1,0 +1,32 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: podman
+
+platforms:
+  - name: almalinux9-web
+    image: docker.io/almalinux:9
+    pre_build_image: true
+    systemd: always
+    command: /usr/sbin/init
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
+    published_ports:
+      - "8080:80"
+
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      almalinux9-web:
+        ansible_python_interpreter: /usr/bin/python3
+
+verifier:
+  name: ansible

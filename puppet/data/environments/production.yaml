@@ -1,0 +1,36 @@
+---
+# Production environment settings
+# These apply to all nodes in the production environment
+
+# Stricter security settings for production
+profile::base::selinux_mode: enforcing
+
+# Production-specific sysctl hardening
+profile::base::sysctl_settings:
+  net.ipv4.ip_forward: '0'
+  net.ipv4.conf.all.send_redirects: '0'
+  net.ipv4.conf.default.accept_redirects: '0'
+  net.ipv4.conf.all.accept_redirects: '0'
+  net.ipv4.icmp_echo_ignore_broadcasts: '1'
+  net.ipv4.conf.all.log_martians: '1'
+  net.ipv6.conf.all.disable_ipv6: '1'
+  kernel.randomize_va_space: '2'
+
+# Production NTP servers (internal time servers)
+profile::base::ntp_servers:
+  - ntp1.prod.lab.local
+  - ntp2.prod.lab.local
+
+# Monitoring configuration
+profile::monitoring::enabled: true
+profile::monitoring::retention_days: 90
+profile::monitoring::alerting_enabled: true
+
+# Logging configuration
+profile::logging::log_level: warn
+profile::logging::remote_syslog: syslog.prod.lab.local
+
+# Backup settings
+profile::backup::enabled: true
+profile::backup::schedule: daily
+profile::backup::retention_days: 30
