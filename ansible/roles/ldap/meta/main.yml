@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: Justin
+  description: OpenLDAP server role for directory services with base DIT configuration and user management
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - ldap
+    - openldap
+    - directory
+    - authentication
+    - identity
+
+dependencies: []

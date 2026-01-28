@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Justin
+  description: SSSD role for LDAP authentication integration with authselect and automatic home directory creation
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - sssd
+    - ldap
+    - authentication
+    - pam
+    - identity
+    - security
+
+dependencies: []

@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Justin
+  description: HAProxy load balancer role with backend server configuration, stats interface, and SELinux settings
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - loadbalancer
+    - haproxy
+    - proxy
+    - http
+    - reverseproxy
+    - highavailability
+
+dependencies: []

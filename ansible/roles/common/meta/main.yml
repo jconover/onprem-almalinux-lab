@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Justin
+  description: Common baseline configuration for RHEL/AlmaLinux servers including package installation, timezone, hostname, MOTD, sysctl hardening, SELinux, and core services
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - system
+    - baseline
+    - hardening
+    - selinux
+    - sysctl
+    - rhel
+    - almalinux
+
+dependencies: []

@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Justin
+  description: BIND DNS server installation and configuration with forward and reverse zone management for internal DNS resolution
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - dns
+    - bind
+    - named
+    - networking
+    - nameserver
+    - rhel
+    - almalinux
+
+dependencies: []

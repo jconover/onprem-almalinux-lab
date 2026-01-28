@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Justin
+  description: MariaDB database server installation and configuration with secure root password, user management, and database provisioning
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - database
+    - mariadb
+    - mysql
+    - sql
+    - rhel
+    - almalinux
+
+dependencies: []

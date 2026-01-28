@@ -1,0 +1,38 @@
+{
+  "name": "justin-role",
+  "version": "1.0.0",
+  "author": "Justin",
+  "summary": "Puppet roles module that composes profiles into complete server configurations for app, database, admin, and bastion servers",
+  "license": "MIT",
+  "source": "https://github.com/username/puppet-role",
+  "dependencies": [
+    {"name": "puppetlabs/stdlib", "version_requirement": ">= 9.0.0 < 10.0.0"},
+    {"name": "justin/profile", "version_requirement": ">= 1.0.0 < 2.0.0"}
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": ["8", "9"]
+    },
+    {
+      "operatingsystem": "AlmaLinux",
+      "operatingsystemrelease": ["8", "9", "10"]
+    }
+  ],
+  "requirements": [
+    {"name": "puppet", "version_requirement": ">= 7.0.0 < 9.0.0"}
+  ],
+  "tags": [
+    "role",
+    "roles",
+    "profiles",
+    "almalinux",
+    "rhel",
+    "infrastructure",
+    "server",
+    "app_server",
+    "db_server",
+    "bastion",
+    "admin"
+  ]
+}

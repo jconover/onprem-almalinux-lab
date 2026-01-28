@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Justin
+  description: Apache HTTP Server (httpd) installation and configuration with virtual host support and SSL module on RHEL/AlmaLinux
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - web
+    - apache
+    - httpd
+    - webserver
+    - ssl
+    - rhel
+    - almalinux
+
+dependencies: []
