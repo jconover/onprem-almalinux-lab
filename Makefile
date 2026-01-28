@@ -1,6 +1,9 @@
 .PHONY: help up-alma10 up-alma9 down-alma10 down-alma9 destroy-alma10 destroy-alma9 destroy-all \
        ansible-run ansible-check ansible-run-alma9 ansible-check-alma9 \
-       puppet-apply puppet-validate tf-init-dev tf-plan-dev tf-validate status
+       puppet-apply puppet-validate tf-init-dev tf-plan-dev tf-validate status \
+       lint lint-ansible lint-terraform lint-puppet lint-shell \
+       ci ci-setup \
+       pre-commit-install pre-commit-run
 
 ALMA10_DIR := vagrant/alma10
 ALMA9_DIR  := vagrant/alma9
@@ -82,3 +85,44 @@ tf-plan-dev: ## Plan Terraform dev environment
 
 tf-validate: ## Validate all Terraform configurations
 	cd terraform/environments/dev && terraform validate
+
+# ---------------------------------------------------------------------------
+# Quality & Testing
+# ---------------------------------------------------------------------------
+
+lint: lint-ansible lint-terraform lint-puppet lint-shell ## Run all linters
+
+lint-ansible: ## Run yamllint and ansible-lint on ansible/
+	yamllint $(ANSIBLE_DIR)/
+	ansible-lint $(ANSIBLE_DIR)/
+
+lint-terraform: ## Run terraform fmt -check and terraform validate
+	terraform fmt -check -recursive terraform/
+	cd terraform/environments/dev && terraform validate
+
+lint-puppet: ## Run puppet parser validate and puppet-lint
+	cd puppet && find manifests modules -name '*.pp' -exec puppet parser validate {} +
+	puppet-lint puppet/
+
+lint-shell: ## Run shellcheck on provision/*.sh
+	shellcheck provision/*.sh
+
+# ---------------------------------------------------------------------------
+# CI/CD Helpers
+# ---------------------------------------------------------------------------
+
+ci: lint tf-validate ## Run full CI validation (lint + validate)
+
+ci-setup: ## Install CI dependencies
+	pip install ansible ansible-lint yamllint
+	gem install puppet-lint
+
+# ---------------------------------------------------------------------------
+# Pre-commit
+# ---------------------------------------------------------------------------
+
+pre-commit-install: ## Install pre-commit hooks
+	pip install pre-commit && pre-commit install
+
+pre-commit-run: ## Run pre-commit on all files
+	pre-commit run --all-files
