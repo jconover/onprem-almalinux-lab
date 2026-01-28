@@ -670,56 +670,57 @@ ansible-playbook -i inventory.ini site.yml --check --diff
 
 ---
 
-## 8. Interview Talking Points
+## 8. Key Concepts to Master
 
-### "Describe your GitOps workflow for infrastructure."
+### GitOps Workflow for Infrastructure
 
-> "All infrastructure code lives in Git with protected main branch. Every change
-> starts as a PR from a short-lived feature branch. CI runs automatically:
-> puppet-lint, ansible-lint, terraform plan. The plan output is posted as a PR
-> comment so reviewers can see exactly what will change in production. After
-> review and approval, merge to main triggers deployment: r10k deploys Puppet
-> environments, Ansible runs against the target inventory, and Terraform applies
-> the plan. No one runs `terraform apply` from their laptop. This gives us
-> an audit trail, peer review, and rollback via `git revert`."
+All infrastructure code lives in Git with a protected main branch. Every change
+starts as a PR from a short-lived feature branch. CI runs automatically:
+puppet-lint, ansible-lint, terraform plan. The plan output is posted as a PR
+comment so reviewers can see exactly what will change in production. After
+review and approval, merge to main triggers deployment: r10k deploys Puppet
+environments, Ansible runs against the target inventory, and Terraform applies
+the plan. No one runs `terraform apply` from their laptop. This gives you
+an audit trail, peer review, and rollback via `git revert`.
 
-### "How do you handle config drift?"
+### Handling Configuration Drift
 
-> "Three layers. First, Puppet agents run every 30 minutes and automatically
-> correct drift to the declared state. Second, Terraform drift detection runs
-> as a scheduled CI job -- `terraform plan` at 6 AM daily. If drift is
-> detected, it creates an alert. Third, Ansible `--check --diff` runs weekly
-> to verify idempotent convergence. For emergency manual changes, we have a
-> policy: fix it now, then codify it in a PR within 24 hours. The PR adds the
-> change to automation so it persists and is version-controlled."
+Use three layers to manage drift effectively. First, Puppet agents run every
+30 minutes and automatically correct drift to the declared state. Second,
+Terraform drift detection runs as a scheduled CI job -- `terraform plan` at
+6 AM daily. If drift is detected, it creates an alert. Third, Ansible
+`--check --diff` runs weekly to verify idempotent convergence. For emergency
+manual changes, establish a policy: fix it now, then codify it in a PR within
+24 hours. The PR adds the change to automation so it persists and is
+version-controlled.
 
-### "How do you manage secrets in Git?"
+### Secret Management in Git
 
-> "We never store plaintext secrets in Git. For Ansible, we use ansible-vault
-> to encrypt sensitive variables in `vault.yml`. The vault password is stored
-> in the CI platform's secret manager. For Terraform, sensitive variables are
-> marked with `sensitive = true` and injected via CI environment variables
-> from the secret store. For Puppet, hiera-eyaml encrypts values inline in
-> YAML files using asymmetric encryption. All three approaches let us commit
-> the encrypted files to Git while keeping plaintext secrets out of version
-> control. For rotation, we re-encrypt and commit a new PR."
+Never store plaintext secrets in Git. For Ansible, use ansible-vault to encrypt
+sensitive variables in `vault.yml`. The vault password is stored in the CI
+platform's secret manager. For Terraform, sensitive variables are marked with
+`sensitive = true` and injected via CI environment variables from the secret
+store. For Puppet, hiera-eyaml encrypts values inline in YAML files using
+asymmetric encryption. All three approaches let you commit the encrypted files
+to Git while keeping plaintext secrets out of version control. For rotation,
+re-encrypt and commit a new PR.
 
-### "What is your code review process for infrastructure changes?"
+### Code Review Process for Infrastructure Changes
 
-> "Every infrastructure PR requires at least one approval from a team member.
-> Reviewers check: Does the change match the stated intent? Does the Terraform
-> plan look correct? Are there any security implications (open ports, public
-> access)? Is the change reversible? Are there test results (Molecule, rspec)?
-> We use PR templates with checklists for common concerns. For high-risk
-> changes (anything touching production networking or databases), we require
-> two approvals and a deployment window."
+Every infrastructure PR requires at least one approval from a team member.
+Reviewers check: Does the change match the stated intent? Does the Terraform
+plan look correct? Are there any security implications (open ports, public
+access)? Is the change reversible? Are there test results (Molecule, rspec)?
+Use PR templates with checklists for common concerns. For high-risk changes
+(anything touching production networking or databases), require two approvals
+and a deployment window.
 
-### "How do you handle rollbacks for infrastructure changes?"
+### Rollback Strategies for Infrastructure Changes
 
-> "For Puppet and Ansible, `git revert` the PR and deploy. The next Puppet
-> agent run or Ansible playbook execution reverts the configuration. For
-> Terraform, it depends on the change. Reverting the code and running
-> `terraform apply` works for most cases. For destructive changes (deleted
-> resources), you may need to recreate from scratch or restore from backup.
-> This is why we review Terraform plans carefully before merge. We also tag
-> known-good states so we can check out a specific version if needed."
+For Puppet and Ansible, `git revert` the PR and deploy. The next Puppet agent
+run or Ansible playbook execution reverts the configuration. For Terraform, it
+depends on the change. Reverting the code and running `terraform apply` works
+for most cases. For destructive changes (deleted resources), you may need to
+recreate from scratch or restore from backup. This is why reviewing Terraform
+plans carefully before merge is essential. Also tag known-good states so you
+can check out a specific version if needed.

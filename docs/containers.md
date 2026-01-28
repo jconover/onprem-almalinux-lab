@@ -5,8 +5,8 @@
 Container technology is a core competency for Senior Linux Admin roles. RHEL 8+
 (and AlmaLinux as its downstream) replaced Docker with a suite of daemonless,
 rootless, OCI-compliant tools: **Podman**, **Buildah**, and **Skopeo**. Understanding
-why Red Hat made this shift and how to operate these tools is frequently tested
-in interviews.
+why Red Hat made this shift and how to operate these tools is essential knowledge
+for modern Linux administration.
 
 This document covers:
 - Podman as a Docker-compatible container runtime
@@ -608,65 +608,65 @@ podman export <container-id> -o container-fs.tar
 
 ---
 
-## 8. Interview Talking Points
+## 8. Key Concepts to Master
 
-### "Why did RHEL move to Podman?"
+### Why RHEL Moved to Podman
 
-> "Red Hat moved to Podman to eliminate the Docker daemon, which was a single
-> point of failure running as root. If the Docker daemon crashes, all containers
-> die. Podman uses a fork/exec model where each container is an independent
-> process. It runs rootless by default, reducing the attack surface. It also
-> integrates natively with systemd -- containers can be managed as systemd
-> services via Quadlet. The CLI is Docker-compatible, so `alias docker=podman`
-> works for most workflows."
+Red Hat moved to Podman to eliminate the Docker daemon, which was a single
+point of failure running as root. If the Docker daemon crashes, all containers
+die. Podman uses a fork/exec model where each container is an independent
+process. It runs rootless by default, reducing the attack surface. It also
+integrates natively with systemd -- containers can be managed as systemd
+services via Quadlet. The CLI is Docker-compatible, so `alias docker=podman`
+works for most workflows.
 
-### "How do rootless containers work?"
+### How Rootless Containers Work
 
-> "Rootless containers use Linux user namespaces to map UID 0 inside the container
-> to an unprivileged UID on the host. The mapping is defined in `/etc/subuid`
-> and `/etc/subgid` -- for example, my user gets UIDs 100000 through 165535.
-> Inside the container, processes run as root, but the host sees them as my
-> user's subordinate UIDs. Networking uses `slirp4netns` or `pasta` instead of
-> bridge networking, since creating bridges requires root. Storage lives in
-> `~/.local/share/containers/` in the user's home directory."
+Rootless containers use Linux user namespaces to map UID 0 inside the container
+to an unprivileged UID on the host. The mapping is defined in `/etc/subuid`
+and `/etc/subgid` -- for example, a user gets UIDs 100000 through 165535.
+Inside the container, processes run as root, but the host sees them as the
+user's subordinate UIDs. Networking uses `slirp4netns` or `pasta` instead of
+bridge networking, since creating bridges requires root. Storage lives in
+`~/.local/share/containers/` in the user's home directory.
 
-### "What is Quadlet and when would you use it?"
+### Understanding Quadlet
 
-> "Quadlet is systemd integration for Podman containers. You write a `.container`
-> file in `/etc/containers/systemd/` (or the user equivalent) that declares the
-> image, ports, volumes, and restart policy. At boot, a systemd generator converts
-> this into a proper systemd unit. I use Quadlet for any container that should
-> run as a persistent service -- web servers, monitoring agents, databases.
-> It supports health checks, auto-updates from registries, and pod grouping.
-> It replaced `podman generate systemd` which was deprecated in Podman 4.4."
+Quadlet is systemd integration for Podman containers. You write a `.container`
+file in `/etc/containers/systemd/` (or the user equivalent) that declares the
+image, ports, volumes, and restart policy. At boot, a systemd generator converts
+this into a proper systemd unit. Use Quadlet for any container that should
+run as a persistent service -- web servers, monitoring agents, databases.
+It supports health checks, auto-updates from registries, and pod grouping.
+It replaced `podman generate systemd` which was deprecated in Podman 4.4.
 
-### "Explain the container runtime landscape."
+### The Container Runtime Landscape
 
-> "At the bottom is the OCI runtime -- `runc` or `crun` -- which creates Linux
-> namespaces and cgroups. Above that, you have high-level runtimes that manage
-> image pulls, storage, and lifecycle. The three main ones are: Docker (daemon-based,
-> the original), containerd (extracted from Docker, used by most cloud K8s),
-> and CRI-O (purpose-built for Kubernetes, used by OpenShift). Podman is a
-> client tool, not a daemon -- it uses the same OCI runtimes but operates
-> in a daemonless, rootless model. For Kubernetes, CRI-O and containerd both
-> implement the CRI interface that kubelet uses."
+At the bottom is the OCI runtime -- `runc` or `crun` -- which creates Linux
+namespaces and cgroups. Above that, you have high-level runtimes that manage
+image pulls, storage, and lifecycle. The three main ones are: Docker (daemon-based,
+the original), containerd (extracted from Docker, used by most cloud K8s),
+and CRI-O (purpose-built for Kubernetes, used by OpenShift). Podman is a
+client tool, not a daemon -- it uses the same OCI runtimes but operates
+in a daemonless, rootless model. For Kubernetes, CRI-O and containerd both
+implement the CRI interface that kubelet uses.
 
-### "How do you handle container security?"
+### Container Security Best Practices
 
-> "Multiple layers. First, rootless containers so nothing runs as host root.
-> Second, SELinux with `container_t` type confines what containers can access.
-> Third, `:Z` volume labels ensure files get the right SELinux context. Fourth,
-> minimal base images like UBI-minimal to reduce attack surface. Fifth, image
-> scanning in CI for known vulnerabilities. Sixth, read-only root filesystem
-> where possible (`--read-only`). Seventh, drop all capabilities and add back
-> only what is needed (`--cap-drop=ALL --cap-add=NET_BIND_SERVICE`)."
+Container security involves multiple layers. First, rootless containers so nothing runs as host root.
+Second, SELinux with `container_t` type confines what containers can access.
+Third, `:Z` volume labels ensure files get the right SELinux context. Fourth,
+minimal base images like UBI-minimal to reduce attack surface. Fifth, image
+scanning in CI for known vulnerabilities. Sixth, read-only root filesystem
+where possible (`--read-only`). Seventh, drop all capabilities and add back
+only what is needed (`--cap-drop=ALL --cap-add=NET_BIND_SERVICE`).
 
-### "How would you containerize a legacy application?"
+### Containerizing Legacy Applications
 
-> "Start by understanding the application's dependencies -- libraries, config
-> files, port bindings, filesystem paths. Create a Containerfile using a
-> UBI base image, install dependencies, copy the application. Test locally
-> with `podman run`. Create a Quadlet file for systemd management. For
-> persistent data, use named volumes or bind mounts with `:Z` labels.
-> For multiple processes, use a pod with one container per process. Test
-> with `podman play kube` to validate the Kubernetes migration path."
+Start by understanding the application's dependencies -- libraries, config
+files, port bindings, filesystem paths. Create a Containerfile using a
+UBI base image, install dependencies, copy the application. Test locally
+with `podman run`. Create a Quadlet file for systemd management. For
+persistent data, use named volumes or bind mounts with `:Z` labels.
+For multiple processes, use a pod with one container per process. Test
+with `podman play kube` to validate the Kubernetes migration path.
