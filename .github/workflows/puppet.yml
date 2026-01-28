@@ -1,0 +1,90 @@
+---
+name: Puppet Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'puppet/**'
+      - '.github/workflows/puppet.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'puppet/**'
+      - '.github/workflows/puppet.yml'
+
+jobs:
+  validate-puppet:
+    name: Validate Puppet Manifests and Templates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Puppet Agent
+        run: |
+          # Add Puppet repository
+          wget -q https://apt.puppet.com/puppet8-release-jammy.deb
+          sudo dpkg -i puppet8-release-jammy.deb
+          sudo apt-get update -qq
+          sudo apt-get install -y puppet-agent
+          # Add Puppet to PATH for subsequent steps
+          echo "/opt/puppetlabs/bin" >> $GITHUB_PATH
+
+      - name: Install puppet-lint
+        run: |
+          sudo /opt/puppetlabs/puppet/bin/gem install puppet-lint --no-document
+
+      - name: Validate Puppet manifests in puppet/manifests
+        run: |
+          echo "Validating Puppet manifests in puppet/manifests..."
+          find puppet/manifests -name '*.pp' -print0 | while IFS= read -r -d '' file; do
+            echo "Validating: $file"
+            /opt/puppetlabs/bin/puppet parser validate "$file"
+          done
+          echo "All manifests in puppet/manifests validated successfully."
+
+      - name: Validate Puppet manifests in puppet/modules
+        run: |
+          echo "Validating Puppet manifests in puppet/modules..."
+          find puppet/modules -name '*.pp' -print0 | while IFS= read -r -d '' file; do
+            echo "Validating: $file"
+            /opt/puppetlabs/bin/puppet parser validate "$file"
+          done
+          echo "All manifests in puppet/modules validated successfully."
+
+      - name: Run puppet-lint on puppet/modules
+        run: |
+          echo "Running puppet-lint on puppet/modules..."
+          /opt/puppetlabs/puppet/bin/puppet-lint \
+            --no-140chars-check \
+            --fail-on-warnings \
+            puppet/modules/
+          echo "puppet-lint completed successfully."
+
+      - name: Validate EPP templates
+        run: |
+          echo "Checking for EPP templates..."
+          epp_files=$(find puppet -name '*.epp' 2>/dev/null || true)
+          if [ -n "$epp_files" ]; then
+            echo "Found EPP templates, validating..."
+            find puppet -name '*.epp' -print0 | while IFS= read -r -d '' file; do
+              echo "Validating: $file"
+              /opt/puppetlabs/bin/puppet epp validate "$file"
+            done
+            echo "All EPP templates validated successfully."
+          else
+            echo "No EPP templates found, skipping validation."
+          fi
+
+      - name: Validate Hiera YAML files
+        run: |
+          echo "Validating Hiera YAML files..."
+          find puppet -name '*.yaml' -print0 | while IFS= read -r -d '' file; do
+            echo "Validating: $file"
+            ruby -ryaml -e "YAML.load_file('$file')" || { echo "YAML validation failed for $file"; exit 1; }
+          done
+          echo "All Hiera YAML files validated successfully."

@@ -1,0 +1,33 @@
+---
+profile: production
+
+exclude_paths:
+  - .vagrant/
+  - .github/
+  - .terraform/
+
+skip_list:
+  - yaml[line-length]
+  - name[casing]
+
+warn_list:
+  - experimental
+
+kinds:
+  - yaml: |
+      **/*.yaml
+      **/*.yml
+  - playbook: |
+      site.yml
+      site.yaml
+  - tasks: |
+      tasks/*.yml
+      tasks/*.yaml
+  - vars: |
+      vars/*.yml
+      vars/*.yaml
+      defaults/*.yml
+      defaults/*.yaml
+  - handlers: |
+      handlers/*.yml
+      handlers/*.yaml

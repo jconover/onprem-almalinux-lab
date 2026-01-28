@@ -1,0 +1,26 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  indentation:
+    spaces: 2
+    consistent: true
+    check-multi-line-strings: false
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: {}
+  document-start: disable
+  truthy:
+    allowed:
+      - 'true'
+      - 'false'
+      - 'yes'
+      - 'no'
+
+ignore: |
+  .vagrant/
+  .terraform/
+  .git/
