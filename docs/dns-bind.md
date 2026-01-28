@@ -384,7 +384,7 @@ in YYYYMMDDNN format.
 
 - **BIND** is the industry standard for authoritative DNS. It supports zone
   files, DNSSEC, dynamic updates, views, and split-horizon DNS. It is what
-  enterprise environments run and what interviewers expect you to know.
+  enterprise environments run and what Senior Admins expect you to understand.
 - **dnsmasq** is lightweight and great for small-scale DNS/DHCP but lacks
   features needed for enterprise authoritative DNS.
 - **Unbound** is a recursive-only resolver; it cannot serve authoritative
@@ -405,36 +405,42 @@ servers. Both are expected in any enterprise DNS deployment.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: Explain the difference between an authoritative and recursive DNS server.**
-A: An authoritative server has definitive answers for zones it hosts (e.g.,
+### Authoritative vs Recursive DNS Servers
+
+An authoritative server has definitive answers for zones it hosts (e.g.,
 lab.local). A recursive server queries other servers on behalf of clients to
 resolve names it does not host. BIND can be configured as either or both.
 
-**Q: What is the significance of the trailing dot in zone files?**
-A: The trailing dot denotes a fully qualified domain name (FQDN). Without it,
+### The Trailing Dot in Zone Files
+
+The trailing dot denotes a fully qualified domain name (FQDN). Without it,
 BIND appends the zone origin. So `admin.lab.local` in the lab.local zone
 becomes `admin.lab.local.lab.local`, which is a common misconfiguration.
 
-**Q: How do you troubleshoot DNS resolution failures?**
-A: Start with `dig @server name` to test the specific server. Check if named
+### Troubleshooting DNS Resolution Failures
+
+Start with `dig @server name` to test the specific server. Check if named
 is running and listening (ss -tlnp). Validate zone files with
 named-checkzone. Check firewall for port 53. Check SELinux denials. Review
 /var/named/data/named.run for logs.
 
-**Q: What is a PTR record and why does it matter?**
-A: PTR records map IP addresses back to hostnames (reverse DNS). They are
+### Understanding PTR Records
+
+PTR records map IP addresses back to hostnames (reverse DNS). They are
 used by many services for verification: SSH may check reverse DNS on
 connecting clients, mail servers check PTR records to reject spam, and
 logging systems use them for readable hostnames.
 
-**Q: How do you add a new host to DNS?**
-A: Add an A record to the forward zone file, a PTR record to the reverse zone
+### Adding a New Host to DNS
+
+Add an A record to the forward zone file, a PTR record to the reverse zone
 file, increment the SOA serial in both files, validate with named-checkzone,
 and reload named with `rndc reload` or `systemctl reload named`.
 
-**Q: What DNS record types should you know?**
-A: A (IPv4 address), AAAA (IPv6), CNAME (alias), MX (mail exchange), NS
+### Essential DNS Record Types
+
+A (IPv4 address), AAAA (IPv6), CNAME (alias), MX (mail exchange), NS
 (name server), PTR (reverse lookup), SOA (start of authority), SRV (service
 location), TXT (arbitrary text, used for SPF/DKIM/DMARC).

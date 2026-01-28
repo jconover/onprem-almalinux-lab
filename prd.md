@@ -9,10 +9,10 @@ simulate a realistic on-prem data center with multiple nodes, enterprise
 services, and troubleshooting scenarios.
 
 The goal is twofold:
-1. **Interview preparation** -- brush up on core Linux admin competencies
+1. **Skill development** -- build and reinforce core Linux admin competencies
    (systemd, SELinux, firewalld, storage, networking, identity, HA)
 2. **Portfolio artifact** -- a public repo that demonstrates practical knowledge
-   to hiring managers and technical interviewers
+   demonstrating practical, production-ready skills
 
 ---
 
@@ -42,7 +42,7 @@ The goal is twofold:
 ## Plan
 
 Work is organized into phases. Each phase builds on the previous one and maps
-to skills commonly tested in Linux admin interviews.
+to skills every Linux admin needs in production environments.
 
 ### Phase 1 -- Fill Out Core Documentation (`docs/`)
 
@@ -70,17 +70,17 @@ How to confirm the service works end-to-end.
 ## Troubleshooting
 Common failure modes and how to diagnose them (journalctl, ausearch, ss, etc.)
 
-## Interview Talking Points
+## Key Concepts to Master
 Key concepts and commands a candidate should be able to discuss.
 ```
 
-Priority order for docs (highest interview value first):
+Priority order for docs (most foundational skills first):
 
 1. **`lvm-labs.md`** -- LVM is asked about constantly. Cover PV/VG/LV creation,
    extending volumes online, snapshots, restoring from snapshots, `pvs/vgs/lvs`
    output interpretation, XFS vs ext4 resize differences.
 
-2. **`break-fix.md`** -- Troubleshooting is the core of any admin interview.
+2. **`break-fix.md`** -- Troubleshooting is the core skill of any effective admin.
    Write 6-8 discrete scenarios:
    - SELinux denial blocking httpd from serving content in a non-default dir
    - firewalld misconfiguration preventing client access
@@ -145,7 +145,7 @@ Add new roles:
 
 ### Phase 3 -- Add New Lab Scenarios
 
-Create additional doc pages for interview-relevant topics not yet covered:
+Create additional doc pages for essential topics not yet covered:
 
 - **`docs/systemd-deep-dive.md`** -- Custom unit files, timer units (cron
   replacement), journal filtering, resource limits (CPUQuota, MemoryMax),
@@ -175,22 +175,22 @@ Create additional doc pages for interview-relevant topics not yet covered:
 - **Add a Makefile or justfile** at repo root with convenience targets:
   `make up-alma10`, `make destroy-all`, `make ansible-run`, etc.
 
-### Phase 5 -- Polish and Interview Prep
+### Phase 5 -- Polish and Reference Materials
 
 - **Update `README.md`** with a topology diagram (ASCII or mermaid), quickstart
   instructions, and a skills matrix mapping each lab to interview topics
 - **Add a `docs/cheat-sheet.md`** with rapid-fire commands grouped by topic
   (storage, networking, services, users, SELinux, firewall) for last-minute
   review before interviews
-- **Add a `docs/interview-questions.md`** with common Linux admin interview
-  questions and where in this lab each one is demonstrated
+- **Add a `docs/knowledge-check.md`** with knowledge checkpoints for skill validation
+  and where in this lab each one is demonstrated
 - **Tag releases** (v0.1 = current baseline, v0.2 = docs complete, etc.)
 
 ---
 
-## Key Interview Topics Mapped to Lab Components
+## Essential Skills Mapped to Lab Components
 
-| Interview Topic | Lab Component | Doc File |
+| Skill Area | Lab Component | Doc File |
 |----------------|---------------|----------|
 | LVM / Storage | Vagrant extra disks + LVM labs | `lvm-labs.md` |
 | SELinux | Enforcing mode on all nodes, troubleshooting | `break-fix.md`, `selinux-deep-dive.md` |
@@ -213,12 +213,12 @@ Create additional doc pages for interview-relevant topics not yet covered:
 
 ## Suggested Work Order
 
-Start with **Phase 1** (docs). This has the highest ROI for interview prep
+Start with **Phase 1** (docs). This has the highest value for skill development
 because writing the lab guides forces you to actually walk through each
 procedure and solidify the knowledge. It also makes the repo look complete to
 anyone reviewing it.
 
-Within Phase 1, prioritize by interview frequency:
+Within Phase 1, prioritize by production importance:
 1. LVM (almost always asked)
 2. Break/Fix troubleshooting (the "what would you do if..." questions)
 3. DNS (fundamental networking knowledge)
@@ -238,7 +238,7 @@ Phases 3-5 can be done as time permits and are more about depth and polish.
 ## Success Criteria
 
 - Every `docs/` file has actionable, tested lab steps (not just theory)
-- An interviewer cloning this repo can `vagrant up` and follow any lab guide
+- Anyone reviewing this repo can `vagrant up` and follow any lab guide
 - You can explain every command in every doc from memory
 - The Ansible automation actually converges cleanly on a fresh cluster
 - Break/fix scenarios can be set up and solved in under 10 minutes each

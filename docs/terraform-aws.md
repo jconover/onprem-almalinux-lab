@@ -5,7 +5,7 @@
 This lab includes a complete Terraform configuration that mirrors the on-prem
 AlmaLinux cluster in AWS. The goal is to demonstrate that the same multi-tier
 architecture (bastion, admin, app, db) can be expressed as infrastructure-as-code
-for cloud deployment, giving interview evidence of both on-prem and cloud skills.
+for cloud deployment, giving practical demonstration of both on-prem and cloud skills.
 
 Terraform uses **declarative HCL** to define infrastructure, maintains a **state
 file** tracking what exists, and uses a **plan/apply cycle** to converge
@@ -529,65 +529,65 @@ terraform state pull > state-backup.json
 - Automated backups, patching, failover
 - Frees the team from OS-level DB maintenance
 - On-prem lab still teaches self-hosted MariaDB skills
-- Interviewers want to hear you can choose the right approach for each context
+- Senior engineers expect you to understand how to choose the right approach for each context
 
 ---
 
-## 8. Interview Talking Points
+## 8. Key Concepts to Master
 
-### "How do you handle Terraform state in a team?"
+### Handling Terraform State in a Team
 
-> "We store state in S3 with server-side encryption and use DynamoDB for state
-> locking. Each environment has its own state file keyed by path --
-> `environments/dev/terraform.tfstate`. We never commit state to Git. Access
-> to the S3 bucket is restricted by IAM policy. For debugging, we can use
-> `terraform state pull` to inspect state locally, and `terraform state mv`
-> for refactoring without destroying resources."
+Store state in S3 with server-side encryption and use DynamoDB for state
+locking. Each environment has its own state file keyed by path --
+`environments/dev/terraform.tfstate`. Never commit state to Git. Access
+to the S3 bucket is restricted by IAM policy. For debugging, use
+`terraform state pull` to inspect state locally, and `terraform state mv`
+for refactoring without destroying resources.
 
-### "Describe your Terraform module design approach."
+### Terraform Module Design Approach
 
-> "I follow single-responsibility modules. In this project, the VPC module only
-> handles networking, security_groups handles firewall rules, ec2_cluster handles
-> compute, and rds handles the database. Each module takes inputs via variables,
-> produces outputs for other modules to consume, and uses `merge(var.tags, {...})`
-> for consistent tagging. Environments compose modules with different parameters --
-> dev uses `t3.micro` and single-AZ, prod uses larger instances with multi-AZ.
-> Module interfaces are documented with `description` on every variable."
+Follow single-responsibility modules. In this project, the VPC module only
+handles networking, security_groups handles firewall rules, ec2_cluster handles
+compute, and rds handles the database. Each module takes inputs via variables,
+produces outputs for other modules to consume, and uses `merge(var.tags, {...})`
+for consistent tagging. Environments compose modules with different parameters --
+dev uses `t3.micro` and single-AZ, prod uses larger instances with multi-AZ.
+Module interfaces are documented with `description` on every variable.
 
-### "How do you manage secrets in Terraform?"
+### Managing Secrets in Terraform
 
-> "Sensitive variables are marked with `sensitive = true` so Terraform redacts
-> them from plan output. Values are injected via environment variables
-> (`TF_VAR_db_password`), CI/CD secrets, or a secrets manager. We never store
-> secrets in `.tfvars` files committed to Git. For dynamic secrets, we use the
-> AWS Secrets Manager data source or Vault provider to read secrets at plan time.
-> The RDS password in this lab uses `sensitive = true` on the variable declaration."
+Sensitive variables are marked with `sensitive = true` so Terraform redacts
+them from plan output. Values are injected via environment variables
+(`TF_VAR_db_password`), CI/CD secrets, or a secrets manager. Never store
+secrets in `.tfvars` files committed to Git. For dynamic secrets, use the
+AWS Secrets Manager data source or Vault provider to read secrets at plan time.
+The RDS password in this lab uses `sensitive = true` on the variable declaration.
 
-### "What's your CI/CD pipeline for Terraform?"
+### CI/CD Pipeline for Terraform
 
-> "On every PR that touches `terraform/`, CI runs `terraform fmt -check`,
-> `terraform validate`, and `terraform plan`. The plan output is posted as a PR
-> comment so reviewers can see exactly what will change. On merge to main,
-> CD runs `terraform apply` with the saved plan. We use Atlantis or GitHub
-> Actions. The key principle is that `terraform apply` only runs from CI,
-> never from developer laptops -- this ensures the state file is always
-> consistent with the reviewed code."
+On every PR that touches `terraform/`, CI runs `terraform fmt -check`,
+`terraform validate`, and `terraform plan`. The plan output is posted as a PR
+comment so reviewers can see exactly what will change. On merge to main,
+CD runs `terraform apply` with the saved plan. Use Atlantis or GitHub
+Actions. The key principle is that `terraform apply` only runs from CI,
+never from developer laptops -- this ensures the state file is always
+consistent with the reviewed code.
 
-### "How do you handle infrastructure drift?"
+### Handling Infrastructure Drift
 
-> "Scheduled CI jobs run `terraform plan` nightly and alert on any drift.
-> Common drift sources: console changes, auto-scaling events, AWS-initiated
-> changes (security patches). For console changes, we either apply to
-> reconcile or `terraform import` to adopt the change. We have a policy that
-> all infrastructure changes go through code -- manual console changes are
-> treated as incidents and remediated via PR."
+Scheduled CI jobs run `terraform plan` nightly and alert on any drift.
+Common drift sources: console changes, auto-scaling events, AWS-initiated
+changes (security patches). For console changes, either apply to
+reconcile or `terraform import` to adopt the change. Have a policy that
+all infrastructure changes go through code -- manual console changes are
+treated as incidents and remediated via PR.
 
-### "How would you migrate this on-prem lab to AWS?"
+### Migrating On-Prem Infrastructure to AWS
 
-> "The Terraform modules already mirror the on-prem architecture. Migration
-> steps: First, provision the VPC and security groups. Second, launch EC2
-> instances with the same user_data bootstrap. Third, migrate MariaDB data
-> to RDS using mysqldump or AWS DMS. Fourth, update DNS (Route 53) to point
-> to the new infrastructure. Fifth, configure the same Puppet/Ansible automation
-> to target the EC2 instances. The key challenge is data migration and
-> cutover timing -- I would do a blue/green approach with DNS failover."
+The Terraform modules already mirror the on-prem architecture. Migration
+steps: First, provision the VPC and security groups. Second, launch EC2
+instances with the same user_data bootstrap. Third, migrate MariaDB data
+to RDS using mysqldump or AWS DMS. Fourth, update DNS (Route 53) to point
+to the new infrastructure. Fifth, configure the same Puppet/Ansible automation
+to target the EC2 instances. The key challenge is data migration and
+cutover timing -- use a blue/green approach with DNS failover.

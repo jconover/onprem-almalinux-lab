@@ -386,37 +386,44 @@ are still needed for `showmount` and backward compatibility.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: What firewall ports does NFS require?**
-A: NFSv4 primarily uses TCP 2049. For full compatibility (showmount, NFSv3
+### Understanding NFS Firewall Requirements
+
+NFSv4 primarily uses TCP 2049. For full compatibility (showmount, NFSv3
 fallback), also open mountd (20048) and rpc-bind (111). In firewalld, add
 services: nfs, mountd, rpc-bind.
 
-**Q: Explain root_squash.**
-A: root_squash maps UID 0 (root) from NFS clients to the nobody user on the
+### Understanding root_squash
+
+root_squash maps UID 0 (root) from NFS clients to the nobody user on the
 server. This prevents a compromised client's root from having root access
 to the NFS share. It is enabled by default and should only be disabled for
 specific automation use cases on trusted networks.
 
-**Q: What is the `_netdev` mount option?**
-A: It tells systemd that the mount depends on network availability. Without
-it, the system may try to mount the NFS share before the network is up,
+### Understanding the _netdev Mount Option
+
+The `_netdev` option tells systemd that the mount depends on network availability.
+Without it, the system may try to mount the NFS share before the network is up,
 causing a boot hang.
 
-**Q: How does autofs differ from a persistent NFS mount?**
-A: autofs mounts filesystems on demand when accessed and unmounts them after
+### Understanding autofs vs Persistent Mounts
+
+autofs mounts filesystems on demand when accessed and unmounts them after
 a configurable timeout. This reduces server connections and avoids boot
 issues. Persistent mounts (fstab) are always available but require the
 server to be reachable at boot time.
 
-**Q: How do you troubleshoot "permission denied" on an NFS mount?**
-A: Check /etc/exports on the server (is the client allowed?). Check firewall
-rules. Check SELinux booleans (nfs_export_all_rw on server,
-use_nfs_home_dirs on client). Use showmount -e to verify exports are
-visible from the client.
+### Troubleshooting NFS Permission Denied
 
-**Q: How would you integrate NFS with Kerberos for security?**
-A: Use NFSv4 with `sec=krb5p` in exports for encryption and integrity.
-Configure keytabs for nfs/hostname principals on both server and client.
-This replaces UID-based trust with cryptographic authentication.
+When encountering "permission denied" on an NFS mount, check /etc/exports on
+the server (is the client allowed?). Check firewall rules. Check SELinux
+booleans (nfs_export_all_rw on server, use_nfs_home_dirs on client). Use
+showmount -e to verify exports are visible from the client.
+
+### Integrating NFS with Kerberos Security
+
+To integrate NFS with Kerberos, use NFSv4 with `sec=krb5p` in exports for
+encryption and integrity. Configure keytabs for nfs/hostname principals on
+both server and client. This replaces UID-based trust with cryptographic
+authentication.

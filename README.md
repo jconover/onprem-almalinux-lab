@@ -1,6 +1,6 @@
 # Enterprise On-Prem Linux Administration Lab
 
-A **hands-on lab environment** for Senior/Lead Linux Admin interview preparation,
+A **hands-on learning environment** for Junior Linux Admins developing enterprise skills through Senior Admin mentorship,
 covering Puppet, Ansible, Terraform, RHEL 9/10, HA clustering, identity management,
 containers, monitoring, and GitOps. Every component is runnable on a local
 KVM/libvirt host using Vagrant.
@@ -64,7 +64,7 @@ KVM/libvirt host using Vagrant.
 | **Monitoring (Prometheus, node_exporter)** | `ansible/roles/monitoring/`, `puppet/modules/profile/manifests/monitoring.pp` | [`docs/monitoring.md`](docs/monitoring.md) |
 | **GitOps (CI/CD, drift detection)** | Repo structure itself demonstrates GitOps | [`docs/gitops.md`](docs/gitops.md) |
 | **SELinux, firewalld, systemd** | Every role enforces SELinux + firewalld | All docs include SELinux/firewall sections |
-| **Interview prep** | -- | [`docs/interview-questions.md`](docs/interview-questions.md) |
+| **Knowledge check** | -- | [`docs/knowledge-check.md`](docs/knowledge-check.md) |
 | **Command reference** | -- | [`docs/cheat-sheet.md`](docs/cheat-sheet.md) |
 
 ---
@@ -207,7 +207,7 @@ vagrant ssh alma10-db
     ├── monitoring.md           # Prometheus/Grafana + Nagios/Zabbix/ELK
     ├── gitops.md               # CI/CD pipelines, drift detection, branching
     ├── cheat-sheet.md          # Quick-reference commands by category
-    └── interview-questions.md  # 55 questions (junior -> lead) with answers
+    └── knowledge-check.md        # 55 essential topics with explanations
 ```
 
 ---
@@ -223,7 +223,7 @@ Every doc follows a consistent 8-section structure:
 5. **Verification / Testing** -- End-to-end validation commands
 6. **Troubleshooting** -- Common failures with exact diagnostic commands
 7. **Architecture Decision Rationale** -- Why X over Y, with tradeoff analysis
-8. **Interview Talking Points** -- Senior-level Q&A format
+8. **Key Concepts to Master** -- What Senior Admins expect you to understand
 
 ---
 
@@ -242,7 +242,7 @@ Every doc follows a consistent 8-section structure:
 11. **Terraform** -- review the AWS IaC that mirrors the on-prem lab
 12. **Containers** -- Podman, Quadlet, rootless on any lab node
 13. **Monitoring + GitOps** -- observability and workflow
-14. **Interview questions + cheat sheet** -- final review
+14. **Knowledge check + command reference** -- validate your understanding
 
 ---
 

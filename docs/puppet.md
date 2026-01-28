@@ -9,7 +9,7 @@ data lookups, EPP templates, and r10k for module management.
 
 Puppet is a critical skill for Senior Linux Admin roles because many enterprises
 adopted it before Ansible existed. Understanding both tools, and when to choose
-each, is a common interview differentiator.
+each, is a skill that distinguishes senior from junior admins.
 
 ### Puppet vs Ansible Comparison
 
@@ -196,7 +196,7 @@ define profile::firewall_service (
 
 ### 4.2 The Role/Profile Pattern
 
-This is the **most important Puppet design pattern** and a guaranteed interview topic.
+This is the **most important Puppet design pattern** and an essential pattern every Puppet admin must understand.
 
 #### The Hierarchy
 
@@ -659,70 +659,70 @@ FACTERLIB=modules/profile/lib/facter facter datacenter
 
 ---
 
-## 8. Interview Talking Points
+## 8. Key Concepts to Master
 
-### "Describe the role/profile pattern."
+### Understanding the Role/Profile Pattern
 
-> "The role/profile pattern is a layered design approach for Puppet code. At the
-> top, `site.pp` classifies each node into exactly one role -- like `role::app_server`.
-> That role includes multiple profiles, each representing a technology stack --
-> like `profile::base`, `profile::web`, and `profile::firewall`. Profiles contain
-> the actual Puppet code and module includes. Data comes from Hiera, never
-> hardcoded. This gives you composable, testable, reusable building blocks.
-> In my lab, `role::db_server` includes five profiles covering base OS, MariaDB,
-> firewall, NFS exports, and monitoring."
+The role/profile pattern is a layered design approach for Puppet code. At the
+top, `site.pp` classifies each node into exactly one role -- like `role::app_server`.
+That role includes multiple profiles, each representing a technology stack --
+like `profile::base`, `profile::web`, and `profile::firewall`. Profiles contain
+the actual Puppet code and module includes. Data comes from Hiera, never
+hardcoded. This gives you composable, testable, reusable building blocks.
+In this lab, `role::db_server` includes five profiles covering base OS, MariaDB,
+firewall, NFS exports, and monitoring.
 
-### "How do you handle environment promotion?"
+### Handling Environment Promotion
 
-> "We use r10k with a control repo where Git branches map to Puppet environments.
-> A feature branch creates an isolated environment for testing. Developers test
-> on their feature environment, merge to a staging branch for integration testing,
-> then merge to production. The Puppetfile pins module versions, so each
-> environment gets reproducible dependencies. CI runs `puppet parser validate`
-> and rspec-puppet on every PR."
+Use r10k with a control repo where Git branches map to Puppet environments.
+A feature branch creates an isolated environment for testing. Developers test
+on their feature environment, merge to a staging branch for integration testing,
+then merge to production. The Puppetfile pins module versions, so each
+environment gets reproducible dependencies. CI runs `puppet parser validate`
+and rspec-puppet on every PR.
 
-### "How do you test Puppet code?"
+### Testing Puppet Code
 
-> "Three layers: First, `puppet parser validate` and `puppet-lint` for syntax
-> and style. Second, rspec-puppet unit tests verify catalog compilation and
-> resource containment. Third, Beaker or Litmus acceptance tests spin up actual
-> VMs and verify real system state. PDK wraps all of this into a standard
-> workflow. In CI, syntax checks run on every commit, unit tests on every PR,
-> and acceptance tests nightly or on release branches."
+Three layers: First, `puppet parser validate` and `puppet-lint` for syntax
+and style. Second, rspec-puppet unit tests verify catalog compilation and
+resource containment. Third, Beaker or Litmus acceptance tests spin up actual
+VMs and verify real system state. PDK wraps all of this into a standard
+workflow. In CI, syntax checks run on every commit, unit tests on every PR,
+and acceptance tests nightly or on release branches.
 
-### "How do you manage secrets in Puppet?"
+### Managing Secrets in Puppet
 
-> "Hiera-eyaml encrypts sensitive values inline in YAML files using asymmetric
-> encryption. Each environment has its own keypair. For rotation, you can
-> re-encrypt with new keys. For more sophisticated needs, the `puppet-vault`
-> module integrates with HashiCorp Vault for dynamic secrets. The lab currently
-> stores passwords in plain YAML for simplicity but would use eyaml in production."
+Hiera-eyaml encrypts sensitive values inline in YAML files using asymmetric
+encryption. Each environment has its own keypair. For rotation, you can
+re-encrypt with new keys. For more sophisticated needs, the `puppet-vault`
+module integrates with HashiCorp Vault for dynamic secrets. The lab currently
+stores passwords in plain YAML for simplicity but would use eyaml in production.
 
-### "What's the difference between `include`, `contain`, and `require` in Puppet?"
+### Understanding include, contain, and require
 
-> "`include` declares a class but does not create ordering relationships with the
-> including class. `contain` is like include but also anchors the contained class
-> inside the containing class, so ordering applied to the outer class flows
-> through. `require` is a metaparameter that creates a dependency edge -- the
-> current resource will not be applied until the required resource succeeds.
-> In the role/profile pattern, profiles should `contain` classes they compose
-> so that roles get predictable ordering."
+`include` declares a class but does not create ordering relationships with the
+including class. `contain` is like include but also anchors the contained class
+inside the containing class, so ordering applied to the outer class flows
+through. `require` is a metaparameter that creates a dependency edge -- the
+current resource will not be applied until the required resource succeeds.
+In the role/profile pattern, profiles should `contain` classes they compose
+so that roles get predictable ordering.
 
-### "How does Puppet handle drift detection?"
+### Puppet Drift Detection
 
-> "The Puppet agent runs every 30 minutes by default. Each run compiles a catalog
-> (desired state) and compares it to the actual state. Any drift is corrected
-> automatically, and the change is reported to PuppetDB. You can audit drift
-> without correcting it using `puppet agent -t --noop`. PuppetDB and the PE
-> console provide dashboards showing which nodes have corrective changes vs
-> intentional changes."
+The Puppet agent runs every 30 minutes by default. Each run compiles a catalog
+(desired state) and compares it to the actual state. Any drift is corrected
+automatically, and the change is reported to PuppetDB. You can audit drift
+without correcting it using `puppet agent -t --noop`. PuppetDB and the PE
+console provide dashboards showing which nodes have corrective changes vs
+intentional changes.
 
-### "Puppet vs Ansible -- when do you use each?"
+### Puppet vs Ansible: Choosing the Right Tool
 
-> "I use Puppet for continuous state enforcement of OS-level configuration --
-> packages, services, files, SELinux booleans, firewall rules, NTP, sysctl.
-> Things that should always be in a known state. I use Ansible for orchestration,
-> application deployments, one-time provisioning tasks, and anything that involves
-> ordering across multiple hosts (rolling restarts, database migrations). In this
-> lab, Puppet manages per-node configuration and Ansible handles multi-node
-> orchestration like deploying SSSD across all clients."
+Use Puppet for continuous state enforcement of OS-level configuration --
+packages, services, files, SELinux booleans, firewall rules, NTP, sysctl.
+Things that should always be in a known state. Use Ansible for orchestration,
+application deployments, one-time provisioning tasks, and anything that involves
+ordering across multiple hosts (rolling restarts, database migrations). In this
+lab, Puppet manages per-node configuration and Ansible handles multi-node
+orchestration like deploying SSSD across all clients.

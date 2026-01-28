@@ -455,38 +455,44 @@ Prometheus endpoint.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: What is the difference between a layer 4 and layer 7 load balancer?**
-A: Layer 4 (TCP) load balancers make routing decisions based on IP and port
+### Layer 4 vs Layer 7 Load Balancing
+
+Layer 4 (TCP) load balancers make routing decisions based on IP and port
 without inspecting the content. Layer 7 (HTTP) load balancers can inspect
 HTTP headers, URLs, and cookies to make smarter routing decisions. HAProxy
 supports both modes.
 
-**Q: Explain round-robin vs leastconn.**
-A: Round-robin distributes requests equally in sequence. Leastconn routes
+### Round-Robin vs Leastconn Algorithms
+
+Round-robin distributes requests equally in sequence. Leastconn routes
 each new request to the server with the fewest active connections. Use
 leastconn when requests have variable processing times (some are fast, some
 are slow), so slower servers do not get overloaded.
 
-**Q: How do you handle session persistence with a load balancer?**
-A: Use sticky sessions via cookies (HAProxy inserts a cookie identifying the
+### Session Persistence with Load Balancers
+
+Use sticky sessions via cookies (HAProxy inserts a cookie identifying the
 backend server) or source IP hashing. Cookie-based persistence is more
 reliable because it survives NAT changes. However, session persistence
 reduces the effectiveness of load balancing.
 
-**Q: How do you perform zero-downtime deployments behind HAProxy?**
-A: Drain the server being updated (stop sending new connections, let
+### Zero-Downtime Deployments
+
+Drain the server being updated (stop sending new connections, let
 existing ones finish). Update the application. Re-enable the server. HAProxy
 supports this via the stats socket: `set server BACKEND/SERVER state drain`.
 
-**Q: What happens when all backend servers fail?**
-A: HAProxy returns a 503 Service Unavailable error. You can configure a
-custom error page or a backup server that only activates when all primary
-servers are down: `server backup_srv IP:PORT check backup`.
+### Handling Backend Failures
 
-**Q: How does HAProxy determine if a backend is healthy?**
-A: Using configurable health checks. `option httpchk GET /` sends an HTTP
-GET request. The `inter` parameter sets check frequency, `fall` sets how
-many consecutive failures mark a server as down, and `rise` sets how many
-consecutive successes bring it back up.
+HAProxy returns a 503 Service Unavailable error when all backends fail. You
+can configure a custom error page or a backup server that only activates
+when all primary servers are down: `server backup_srv IP:PORT check backup`.
+
+### Health Check Configuration
+
+HAProxy uses configurable health checks to determine backend health.
+`option httpchk GET /` sends an HTTP GET request. The `inter` parameter sets
+check frequency, `fall` sets how many consecutive failures mark a server as
+down, and `rise` sets how many consecutive successes bring it back up.

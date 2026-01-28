@@ -500,43 +500,49 @@ single KDC for simplicity but be prepared to discuss multi-KDC architecture.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: How does Kerberos authentication work at a high level?**
-A: The client sends a request to the KDC's Authentication Service (AS).
+### How Kerberos Authentication Works
+
+The client sends a request to the KDC's Authentication Service (AS).
 The AS returns a Ticket Granting Ticket (TGT) encrypted with the user's
 key. The client decrypts it (proving they know the password) and uses the
 TGT to request service tickets from the Ticket Granting Service (TGS).
 Service tickets are presented to target services, which validate them
 using their keytab.
 
-**Q: What is a keytab?**
-A: A keytab is a file containing one or more Kerberos principal keys. It
+### Understanding Keytabs
+
+A keytab is a file containing one or more Kerberos principal keys. It
 allows services (like SSH or Apache) to authenticate without human
 interaction. It is the service equivalent of a password. Keytabs must be
 protected with strict file permissions (600 or 640).
 
-**Q: What happens when there is clock skew?**
-A: Kerberos tickets include timestamps. If the clock difference between
+### Clock Skew and Time Synchronization
+
+Kerberos tickets include timestamps. If the clock difference between
 client and KDC exceeds the maximum skew (default 5 minutes), authentication
 fails with KRB5KRB_AP_ERR_SKEW. This is why NTP (chrony) is mandatory in
 Kerberos environments.
 
-**Q: What is the difference between kinit, klist, and kdestroy?**
-A: `kinit` obtains a TGT from the KDC (authenticates the user). `klist`
+### Essential Commands: kinit, klist, and kdestroy
+
+`kinit` obtains a TGT from the KDC (authenticates the user). `klist`
 displays currently held tickets. `kdestroy` destroys the ticket cache
 (logs out from Kerberos). These are the basic Kerberos troubleshooting
 commands.
 
-**Q: How does kerberized SSH work?**
-A: The SSH server has a host principal keytab. The client, already holding
+### Kerberized SSH Authentication
+
+The SSH server has a host principal keytab. The client, already holding
 a TGT, requests a service ticket for `host/servername` from the KDC. The
 client presents this ticket to the SSH server, which validates it using its
 keytab. No password is transmitted. This requires GSSAPIAuthentication in
 sshd_config and a valid TGT on the client.
 
-**Q: How would you set up Kerberos HA?**
-A: Deploy one primary KDC and one or more replica KDCs. Use `kpropd` to
+### Kerberos High Availability
+
+Deploy one primary KDC and one or more replica KDCs. Use `kpropd` to
 replicate the database. Configure DNS SRV records with multiple KDC entries.
 Clients will fail over automatically. The primary handles password changes
 and admin operations; replicas handle read-only authentication.

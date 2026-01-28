@@ -494,7 +494,7 @@ sudo setsebool -P authlogin_nsswitch_use_ldap on
 | Red Hat backing | Community only | Upstream of RHDS/IdM |
 
 **Trade-off:** OpenLDAP is still widely used in non-Red Hat environments
-and is worth knowing for interviews. 389-ds is the forward-looking choice
+and is valuable background knowledge. 389-ds is the forward-looking choice
 for RHEL-based infrastructure.
 
 ### Why SSSD over direct PAM/LDAP?
@@ -514,38 +514,50 @@ file edits, reducing the risk of misconfiguration.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: openldap-servers is missing from RHEL 9. What do you use instead?**
-A: Red Hat recommends 389 Directory Server (the upstream of Red Hat Directory
-Server and FreeIPA). It can be installed with `dnf install 389-ds-base` and
-configured with `dscreate` and `dsconf`. OpenLDAP is still available via
-EPEL for legacy compatibility.
+### LDAP Server Options in RHEL 9
 
-**Q: What is SSSD and why use it?**
-A: SSSD (System Security Services Daemon) provides centralized authentication,
+The `openldap-servers` package is missing from RHEL 9 base repositories.
+Red Hat recommends 389 Directory Server as the replacement -- it is the
+upstream of Red Hat Directory Server and FreeIPA. Install it with
+`dnf install 389-ds-base` and configure with `dscreate` and `dsconf`.
+OpenLDAP remains available via EPEL for legacy compatibility.
+
+### Understanding SSSD
+
+SSSD (System Security Services Daemon) provides centralized authentication,
 identity lookup, and credential caching. It acts as a broker between the
 system's NSS/PAM and identity providers like LDAP, Kerberos, or Active
-Directory. It enables offline login via cached credentials.
+Directory. A key benefit is offline login capability via cached credentials.
 
-**Q: How do you configure a Linux client to authenticate against LDAP?**
-A: Install sssd and sssd-ldap. Create /etc/sssd/sssd.conf with the LDAP
-server URI, search base, and domain settings. Run `authselect select sssd
-with-mkhomedir` to configure PAM and nsswitch. Enable sssd and oddjobd
-services.
+### Configuring LDAP Authentication on Linux Clients
 
-**Q: What is authselect and how does it differ from authconfig?**
-A: authselect manages PAM and nsswitch.conf configuration through predefined
+To configure a Linux client for LDAP authentication:
+1. Install sssd and sssd-ldap packages
+2. Create /etc/sssd/sssd.conf with the LDAP server URI, search base, and domain settings
+3. Run `authselect select sssd with-mkhomedir` to configure PAM and nsswitch
+4. Enable sssd and oddjobd services
+
+### authselect vs authconfig
+
+authselect manages PAM and nsswitch.conf configuration through predefined
 profiles. Unlike authconfig (deprecated), it does not modify PAM files
-directly, reducing misconfiguration risk. Use `authselect select PROFILE`
-to apply a configuration.
+directly, reducing misconfiguration risk. Apply configurations with
+`authselect select PROFILE`.
 
-**Q: How do you debug SSSD not resolving users?**
-A: Check sssd.conf permissions (must be 0600). Check SSSD logs in
-/var/log/sssd/. Verify LDAP connectivity with ldapsearch. Clear SSSD cache
-with `sss_cache -E`. Use `sssctl user-checks USERNAME` for diagnostics.
+### Debugging SSSD User Resolution
 
-**Q: What POSIX attributes must LDAP user entries have?**
-A: At minimum: uid, uidNumber, gidNumber, homeDirectory, loginShell. These
-are provided by the posixAccount objectClass. Without them, the user will
-not be resolved as a valid UNIX account.
+When SSSD fails to resolve users, follow this troubleshooting approach:
+- Verify sssd.conf permissions (must be 0600)
+- Check SSSD logs in /var/log/sssd/
+- Verify LDAP connectivity with ldapsearch
+- Clear SSSD cache with `sss_cache -E`
+- Use `sssctl user-checks USERNAME` for diagnostics
+
+### Required POSIX Attributes for LDAP Users
+
+LDAP user entries must have these POSIX attributes at minimum: uid, uidNumber,
+gidNumber, homeDirectory, and loginShell. These are provided by the
+posixAccount objectClass. Without them, the user will not be resolved as
+a valid UNIX account.

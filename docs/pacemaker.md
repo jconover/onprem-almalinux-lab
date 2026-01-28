@@ -9,8 +9,8 @@ with the app and app2 nodes, managing a virtual IP address (VIP) and Apache
 httpd as cluster resources. When the active node fails, the VIP and httpd
 automatically migrate to the surviving node.
 
-**This is a differentiator in interviews.** Many Linux admins have never set
-up Pacemaker. Demonstrating hands-on HA cluster experience sets you apart.
+**This is an advanced skill that distinguishes senior admins.** Many Linux admins have never set
+up Pacemaker. Hands-on HA cluster experience elevates your operational capabilities.
 
 ## Architecture
 
@@ -568,43 +568,49 @@ production, consider:
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: What is STONITH and why is it important?**
-A: STONITH (Shoot The Other Node In The Head) is the fencing mechanism that
+### STONITH and Why It Matters
+
+STONITH (Shoot The Other Node In The Head) is the fencing mechanism that
 ensures a failed node is truly dead before resources are migrated. Without
 it, a hung node might still be writing to shared storage while the cluster
 starts the same service on another node, causing data corruption. Never
 disable STONITH in production.
 
-**Q: Explain the difference between Pacemaker and Corosync.**
-A: Corosync handles cluster communication -- node membership, messaging,
+### The Difference Between Pacemaker and Corosync
+
+Corosync handles cluster communication -- node membership, messaging,
 and quorum. Pacemaker is the resource manager that runs on top of Corosync
 and makes decisions about where to run resources, handles failover, and
 enforces constraints. They are complementary: Corosync is the network layer,
 Pacemaker is the brain.
 
-**Q: What is a colocation constraint?**
-A: A colocation constraint ensures two resources run on the same node. For
+### Understanding Colocation Constraints
+
+A colocation constraint ensures two resources run on the same node. For
 example, a VIP and an application must be colocated so that traffic reaching
 the VIP is served by the correct node. Without colocation, the VIP could be
 on one node while the application runs on another.
 
-**Q: How do you test HA cluster failover?**
-A: Put the active node in standby with `pcs node standby NODENAME`. Verify
+### Testing HA Cluster Failover
+
+Put the active node in standby with `pcs node standby NODENAME`. Verify
 that resources migrate to the other node with `pcs status`. Test that the
 service is accessible via the VIP. Then unstandby the node and verify it
 rejoins. You can also simulate a process crash with `pkill` or a node
 crash by stopping Corosync.
 
-**Q: What is quorum and why does it matter?**
-A: Quorum is the minimum number of cluster nodes that must be online to make
+### Quorum and Why It Matters
+
+Quorum is the minimum number of cluster nodes that must be online to make
 decisions (majority: N/2 + 1). It prevents split-brain in network partitions.
 If a partition occurs, only the partition with quorum can run resources.
 Two-node clusters require special handling (no-quorum-policy=ignore or a
 quorum device).
 
-**Q: How would you add a third node to this cluster?**
-A: Run `pcs host auth NEWNODE`, then `pcs cluster node add NEWNODE`. Update
+### Adding a Third Node to the Cluster
+
+Run `pcs host auth NEWNODE`, then `pcs cluster node add NEWNODE`. Update
 the no-quorum-policy to the default (`stop`) since three nodes can achieve
 true quorum. Update STONITH configuration to include the new node.

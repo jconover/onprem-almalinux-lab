@@ -2,7 +2,7 @@
 
 ## Overview
 
-Troubleshooting is the core skill tested in every Linux admin interview. These
+Troubleshooting is the core skill that separates junior admins from senior ones. These
 eight scenarios simulate real production failures covering SELinux, firewalld,
 storage, systemd, time sync, DNS, NFS, and database services. Each scenario
 includes symptoms, diagnostic steps, root cause, fix, and prevention.
@@ -603,38 +603,43 @@ guarantees a clean slate without re-provisioning the entire VM.
 
 ### Why these specific eight scenarios?
 
-They map to the most common interview questions: "Tell me about a time you
-troubleshot..." and "What would you check if...". Each scenario also tests
+They map to the most common production scenarios: "The web server is down..."
+and "Users cannot connect to...". Each scenario also tests
 knowledge of a different subsystem (SELinux, firewall, storage, systemd,
 time, DNS, NFS, databases).
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: Walk me through your troubleshooting methodology.**
-A: I follow a systematic approach: identify symptoms, check service status
+### Systematic Troubleshooting Methodology
+
+Follow a systematic approach: identify symptoms, check service status
 with systemctl, read journal logs, verify SELinux (ausearch), check firewall
 rules, test network connectivity with ss/curl, and verify disk space with
-df. I work from the most likely cause to the least.
+df. Work from the most likely cause to the least.
 
-**Q: A web server is running but clients cannot connect. What do you check?**
-A: First, verify the service is listening on the expected port (ss -tlnp).
+### When a Web Server is Running but Clients Cannot Connect
+
+First, verify the service is listening on the expected port (ss -tlnp).
 Then check firewalld rules. Then check SELinux if the port is non-standard.
 Then test from the local host vs remote to isolate network vs service issues.
 
-**Q: How do you handle a full filesystem in production?**
-A: Immediately identify and remove or compress the largest unnecessary files
+### Handling a Full Filesystem in Production
+
+Immediately identify and remove or compress the largest unnecessary files
 (du -sh, find -size). If it is /var, check if logs are the culprit and
 configure logrotate. Long-term: move /var to its own LVM volume and set
 up monitoring alerts at 80% usage.
 
-**Q: How do you diagnose an SELinux denial?**
-A: Run `ausearch -m avc -ts recent` to see raw denials, then `sealert` for
+### Diagnosing SELinux Denials
+
+Run `ausearch -m avc -ts recent` to see raw denials, then `sealert` for
 human-readable analysis. The output typically tells you exactly what boolean
 to set or what context to apply. Never set SELinux to permissive as a fix.
 
-**Q: A service fails to start. What is your first command?**
-A: `systemctl status SERVICE` for the immediate error message, then
+### When a Service Fails to Start
+
+Run `systemctl status SERVICE` for the immediate error message, then
 `journalctl -u SERVICE --no-pager -n 50` for full context. Check for
 override files with `systemctl cat SERVICE`.

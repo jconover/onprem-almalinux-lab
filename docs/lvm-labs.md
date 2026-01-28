@@ -5,8 +5,8 @@
 Logical Volume Manager (LVM) provides a flexible abstraction layer between
 physical disks and filesystems. It enables online resizing, snapshots, thin
 provisioning, and non-disruptive storage migration -- capabilities that plain
-partitions cannot offer. LVM is one of the most commonly tested topics in
-Linux admin interviews because every enterprise server uses it.
+partitions cannot offer. LVM is essential knowledge for production environments
+because every enterprise server uses it.
 
 This guide contains five hands-on labs using the db node's extra disks.
 
@@ -443,36 +443,46 @@ may be simpler. For any enterprise server managing data, LVM is the standard.
 
 ---
 
-## Interview Talking Points
+## Key Concepts to Master
 
-**Q: Walk me through creating a logical volume from scratch.**
-A: Create PVs with `pvcreate`, aggregate them into a VG with `vgcreate`,
-carve out LVs with `lvcreate`, format with `mkfs`, mount, and add to fstab.
+### Understanding Logical Volume Creation
 
-**Q: How do you extend a filesystem online?**
-A: `lvextend -r /dev/vg/lv -L +SIZE`. The `-r` flag handles both the LV
-extension and filesystem resize in one command. For XFS, `xfs_growfs` is
-called. For ext4, `resize2fs`.
+Creating a logical volume from scratch follows a predictable workflow: create PVs
+with `pvcreate`, aggregate them into a VG with `vgcreate`, carve out LVs with
+`lvcreate`, format with `mkfs`, mount, and add to fstab.
 
-**Q: Can you shrink an XFS filesystem?**
-A: No. XFS only supports growing. To reclaim space on XFS, you must back up,
-delete the LV, recreate it smaller, and restore. ext4 supports shrinking but
-requires the filesystem to be unmounted first.
+### Understanding Online Filesystem Extension
 
-**Q: What is the difference between thick and thin provisioning?**
-A: Thick allocates physical storage at creation time. Thin allocates on write,
-allowing overcommit but risking pool exhaustion if not monitored.
+To extend a filesystem online, use `lvextend -r /dev/vg/lv -L +SIZE`. The `-r`
+flag handles both the LV extension and filesystem resize in one command. For XFS,
+`xfs_growfs` is called. For ext4, `resize2fs`.
 
-**Q: A disk is failing. How do you move data off without downtime?**
-A: Use `pvmove /dev/failing_disk /dev/new_disk` to relocate extents, then
-`vgreduce` and `pvremove` to detach the failing disk.
+### Understanding XFS Shrink Limitations
 
-**Q: How do LVM snapshots work?**
-A: Snapshots use copy-on-write. The snapshot volume only stores blocks that
-have changed since the snapshot was created. The origin LV continues to
-serve live data. If the snapshot volume fills up, it becomes invalid.
+XFS only supports growing -- it cannot be shrunk. To reclaim space on XFS, you
+must back up, delete the LV, recreate it smaller, and restore. ext4 supports
+shrinking but requires the filesystem to be unmounted first.
 
-**Q: What commands do you use to check LVM status?**
-A: `pvs`/`pvdisplay` for physical volumes, `vgs`/`vgdisplay` for volume
-groups, `lvs`/`lvdisplay` for logical volumes. Add `-a` to `lvs` to see
-internal volumes (thin pool metadata, etc.).
+### Understanding Thick vs Thin Provisioning
+
+Thick provisioning allocates physical storage at creation time. Thin provisioning
+allocates on write, allowing overcommit but risking pool exhaustion if not
+monitored.
+
+### Non-Disruptive Disk Migration
+
+When a disk is failing, you can move data off without downtime using
+`pvmove /dev/failing_disk /dev/new_disk` to relocate extents, then `vgreduce`
+and `pvremove` to detach the failing disk.
+
+### Understanding LVM Snapshots
+
+Snapshots use copy-on-write. The snapshot volume only stores blocks that have
+changed since the snapshot was created. The origin LV continues to serve live
+data. If the snapshot volume fills up, it becomes invalid.
+
+### LVM Status Commands
+
+Use `pvs`/`pvdisplay` for physical volumes, `vgs`/`vgdisplay` for volume groups,
+`lvs`/`lvdisplay` for logical volumes. Add `-a` to `lvs` to see internal volumes
+(thin pool metadata, etc.).

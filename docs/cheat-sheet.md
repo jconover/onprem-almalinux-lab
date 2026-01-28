@@ -1,6 +1,6 @@
 # Linux Admin Cheat Sheet
 
-Quick-reference commands grouped by category for last-minute interview prep.
+Quick-reference commands grouped by category for daily operations and learning reinforcement.
 Each entry includes the command, a brief description, and commonly used flags.
 
 ---
