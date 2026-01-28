@@ -1,13 +1,14 @@
-.PHONY: help up-alma10 up-alma9 down-alma10 down-alma9 destroy-all \
-       ansible-run ansible-check puppet-apply status
+.PHONY: help up-alma10 up-alma9 down-alma10 down-alma9 destroy-alma10 destroy-alma9 destroy-all \
+       ansible-run ansible-check ansible-run-alma9 ansible-check-alma9 \
+       puppet-apply puppet-validate tf-init-dev tf-plan-dev tf-validate status
 
 ALMA10_DIR := vagrant/alma10
 ALMA9_DIR  := vagrant/alma9
 ANSIBLE_DIR := ansible
 
 help: ## Show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9_-]+: ## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ": ## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ---------------------------------------------------------------------------
 # Vagrant lifecycle
@@ -24,6 +25,12 @@ down-alma10: ## Halt AlmaLinux 10 cluster
 
 down-alma9: ## Halt AlmaLinux 9 cluster
 	cd $(ALMA9_DIR) && vagrant halt
+
+destroy-alma10: ## Destroy AlmaLinux 10 cluster
+	cd $(ALMA10_DIR) && vagrant destroy -f
+
+destroy-alma9: ## Destroy AlmaLinux 9 cluster
+	cd $(ALMA9_DIR) && vagrant destroy -f
 
 destroy-all: ## Destroy ALL clusters (alma9 + alma10)
 	cd $(ALMA10_DIR) && vagrant destroy -f || true
