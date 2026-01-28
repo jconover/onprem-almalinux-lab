@@ -1,9 +1,25 @@
 # Enterprise On-Prem Linux Administration Lab
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![AlmaLinux](https://img.shields.io/badge/AlmaLinux-9%20%7C%2010-blue.svg)
+![Vagrant](https://img.shields.io/badge/vagrant-libvirt-purple.svg)
+![IaC](https://img.shields.io/badge/IaC-Terraform%20%7C%20Ansible%20%7C%20Puppet-green.svg)
+![Maintained](https://img.shields.io/badge/Maintained-yes-brightgreen.svg)
+
 A **hands-on learning environment** for Junior Linux Admins developing enterprise skills through Senior Admin mentorship,
 covering Puppet, Ansible, Terraform, RHEL 9/10, HA clustering, identity management,
 containers, monitoring, and GitOps. Every component is runnable on a local
 KVM/libvirt host using Vagrant.
+
+---
+
+## About This Project
+
+This repository showcases a **production-grade, fully integrated infrastructure lab** demonstrating the skills required for Senior Linux Administrator and DevOps Engineer roles. It provides a complete enterprise environment with multi-node clusters, high availability, centralized identity management, and comprehensive configuration management using industry-standard tools.
+
+**Who is this for?** Hiring managers, technical recruiters, and engineering teams evaluating candidates for Senior Linux Admin, Systems Engineer, or DevOps positions will find a working demonstration of real-world infrastructure skills--not just isolated examples, but an integrated system where components work together as they would in production.
+
+**Key Technologies:** Ansible (10 roles, vault, orchestration) | Puppet (role/profile pattern, Hiera, r10k) | Terraform (AWS modules, multi-environment) | Pacemaker/Corosync HA clustering | LDAP/Kerberos identity management | HAProxy load balancing | Prometheus monitoring | SELinux/firewalld hardening | LVM storage | Podman containers
 
 ---
 

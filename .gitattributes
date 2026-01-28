@@ -1,0 +1,57 @@
+# Shell scripts - must use LF line endings
+*.sh text eol=lf
+
+# YAML files - text normalization
+*.yml text
+*.yaml text
+
+# Terraform files - text normalization
+*.tf text
+*.tfvars text
+
+# Puppet files - text normalization
+*.pp text
+*.epp text
+
+# Jinja2 templates - text normalization
+*.j2 text
+
+# Markdown files - text normalization
+*.md text
+
+# Makefiles - text normalization
+Makefile text
+makefile text
+
+# Ruby files - text normalization
+Vagrantfile text
+*.rb text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.tar binary
+*.tar.gz binary
+*.gz binary
+*.7z binary
+
+# Linguist language mappings
+*.sh linguist-language=Shell
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+*.tf linguist-language=HCL
+*.tfvars linguist-language=HCL
+*.pp linguist-language=Puppet
+*.epp linguist-language=Puppet
+*.j2 linguist-language=Jinja
+*.md linguist-language=Markdown
+Makefile linguist-language=Makefile
+Vagrantfile linguist-language=Ruby
+*.rb linguist-language=Ruby
+
+# Documentation directory
+docs/** linguist-documentation
