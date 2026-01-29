@@ -9,6 +9,9 @@ ALMA10_DIR := vagrant/alma10
 ALMA9_DIR  := vagrant/alma9
 ANSIBLE_DIR := ansible
 
+# Filter fog warnings from vagrant-libvirt (upstream bug)
+VAGRANT_FILTER := 2>&1 | grep -v '\[fog\]\[WARNING\]'
+
 help: ## Show this help
 	@grep -E '^[a-zA-Z0-9_-]+: ## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ": ## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -18,33 +21,33 @@ help: ## Show this help
 # ---------------------------------------------------------------------------
 
 up-alma10: ## Bring up AlmaLinux 10 cluster
-	cd $(ALMA10_DIR) && vagrant up --provider=libvirt
+	cd $(ALMA10_DIR) && vagrant up --provider=libvirt $(VAGRANT_FILTER)
 
 up-alma9: ## Bring up AlmaLinux 9 cluster
-	cd $(ALMA9_DIR) && vagrant up --provider=libvirt
+	cd $(ALMA9_DIR) && vagrant up --provider=libvirt $(VAGRANT_FILTER)
 
 down-alma10: ## Halt AlmaLinux 10 cluster
-	cd $(ALMA10_DIR) && vagrant halt
+	cd $(ALMA10_DIR) && vagrant halt $(VAGRANT_FILTER)
 
 down-alma9: ## Halt AlmaLinux 9 cluster
-	cd $(ALMA9_DIR) && vagrant halt
+	cd $(ALMA9_DIR) && vagrant halt $(VAGRANT_FILTER)
 
 destroy-alma10: ## Destroy AlmaLinux 10 cluster
-	cd $(ALMA10_DIR) && vagrant destroy -f
+	cd $(ALMA10_DIR) && vagrant destroy -f $(VAGRANT_FILTER)
 
 destroy-alma9: ## Destroy AlmaLinux 9 cluster
-	cd $(ALMA9_DIR) && vagrant destroy -f
+	cd $(ALMA9_DIR) && vagrant destroy -f $(VAGRANT_FILTER)
 
 destroy-all: ## Destroy ALL clusters (alma9 + alma10)
-	cd $(ALMA10_DIR) && vagrant destroy -f || true
-	cd $(ALMA9_DIR) && vagrant destroy -f || true
+	cd $(ALMA10_DIR) && vagrant destroy -f $(VAGRANT_FILTER) || true
+	cd $(ALMA9_DIR) && vagrant destroy -f $(VAGRANT_FILTER) || true
 
 status: ## Show status of all VMs
 	@echo "=== AlmaLinux 10 ==="
-	@cd $(ALMA10_DIR) && vagrant status || true
+	@cd $(ALMA10_DIR) && vagrant status $(VAGRANT_FILTER) || true
 	@echo ""
 	@echo "=== AlmaLinux 9 ==="
-	@cd $(ALMA9_DIR) && vagrant status || true
+	@cd $(ALMA9_DIR) && vagrant status $(VAGRANT_FILTER) || true
 
 # ---------------------------------------------------------------------------
 # Ansible
