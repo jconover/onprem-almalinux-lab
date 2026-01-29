@@ -40,7 +40,8 @@ The Vagrantfile must attach additional disks to the db node. Verify the disks
 exist before starting:
 
 ```bash
-ssh db
+cd onprem-almalinux-lab/vagrant/alma10
+vagrant ssh alma10-db
 lsblk
 ```
 

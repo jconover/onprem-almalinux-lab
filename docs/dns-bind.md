@@ -31,6 +31,16 @@ DNS is a prerequisite for Kerberos, LDAP, and many other enterprise services.
 
 ## Prerequisites
 
+### Login to the nodes:
+```bash
+cd onprem-almalinux-lab/vagrant/alma10
+```
+- bastion: `vagrant ssh alma10-bastion`
+- admin: `vagrant ssh alma10-admin`
+- db: `vagrant ssh alma10-db`
+- app: `vagrant ssh alma10-app`
+- app2: `vagrant ssh alma10-app2`
+
 ### Packages (admin node)
 
 ```bash
